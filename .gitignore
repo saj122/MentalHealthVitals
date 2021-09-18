@@ -32,6 +32,6 @@
 *.app
 
 build
-external
+#external
 .vscode
 CMakeLists.txt.user
