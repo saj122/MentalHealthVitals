@@ -30,20 +30,16 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
 )
 
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/OpenNI2/Include)
+
+target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
+target_link_libraries(${PROJECT_NAME} Qt6::Core)
+target_link_libraries(${PROJECT_NAME} Qt6::Gui)
+target_link_libraries(${PROJECT_NAME} Qt6::OpenGL)
+target_link_libraries(${PROJECT_NAME} Qt6::OpenGLWidgets)
+
 if(WIN32)
-    target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/OpenNI2/Windows/Include)
-    target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
-    target_link_libraries(${PROJECT_NAME} Qt6::Core)
-    target_link_libraries(${PROJECT_NAME} Qt6::Gui)
-    target_link_libraries(${PROJECT_NAME} Qt6::OpenGL)
-    target_link_libraries(${PROJECT_NAME} Qt6::OpenGLWidgets)
     target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/OpenNI2/Windows/Lib/OpenNI2.lib)
 elseif(UNIX)
-    target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/OpenNI2/Linux/Include)
-    target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
-    target_link_libraries(${PROJECT_NAME} Qt6::Core)
-    target_link_libraries(${PROJECT_NAME} Qt6::Gui)
-    target_link_libraries(${PROJECT_NAME} Qt6::OpenGL)
-    target_link_libraries(${PROJECT_NAME} Qt6::OpenGLWidgets)
     target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/OpenNI2/Linux/Redist/libOpenNI2.so)
 endif()
