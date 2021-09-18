@@ -67,10 +67,11 @@ void ImageViewer::initializeGL()
     QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
     const char *fsrc =
         "#version 330\n"
+        "out vec4 FragColor;\n"
         "in vec2 textureCoords;\n"
         "void main()\n"
         "{\n"
-        "    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
+        "    FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n"
         "}\n";
     fshader->compileSourceCode(fsrc);
 

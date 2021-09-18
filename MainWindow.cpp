@@ -38,10 +38,17 @@ MainWindow::MainWindow(QWidget *parent)
     _cameraThread->start();
 }
 
+void MainWindow::errorString(QString string)
+{
+    qDebug() << "Error from the camera threaded process: " << string;
+}
+
 MainWindow::~MainWindow()
 {
-    _cameraThread->exit();
-    delete _camera;
-    delete _rgbViewer;
+    _cameraThread->quit();
+    if (_camera)
+        delete _camera;
+    if(_rgbViewer)
+        delete _rgbViewer;
     delete ui;
 }

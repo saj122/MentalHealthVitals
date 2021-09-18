@@ -30,12 +30,6 @@ add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-)
-
 if(WIN32)
     target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/OpenNI2/Windows/Include)
     target_link_libraries(${PROJECT_NAME} Qt6::Widgets)

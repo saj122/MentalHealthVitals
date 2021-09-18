@@ -19,6 +19,9 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
+    private slots:
+        void errorString(QString string);
+
     private:
         Ui::MainWindow *ui;
 
