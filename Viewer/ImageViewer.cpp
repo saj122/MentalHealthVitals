@@ -135,5 +135,5 @@ void ImageViewer::makeImageTexture()
 
     _vbo.create();
     _vbo.bind();
-    _vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
+    _vbo.allocate(vertData.constData(), (int)(vertData.count() * sizeof(GLfloat)));
 }
