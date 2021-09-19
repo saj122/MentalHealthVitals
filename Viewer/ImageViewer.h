@@ -2,24 +2,20 @@
 #define IMAGEVIEWER_H
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
-#include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QOpenGLFunctions>
 
 QT_BEGIN_NAMESPACE
 class QOpenGLShaderProgram;
 QT_END_NAMESPACE
 
+class DRUtils;
+
 class ImageViewer : public QOpenGLWidget, protected QOpenGLFunctions
 {
     public:
-        enum class Type
-        {
-            RGB,
-            DEPTH
-        };
-
-    public:
-        ImageViewer(Type type);
+        ImageViewer();
         ~ImageViewer();
     protected:
         void initializeGL() override;
@@ -28,15 +24,12 @@ class ImageViewer : public QOpenGLWidget, protected QOpenGLFunctions
     private:
         void makeImageTexture();
     private:
-        QOpenGLShaderProgram* _program;
         QOpenGLBuffer _vbo;
+        QOpenGLShaderProgram* _program;
 
         GLuint _textureId;
 
-        int _width;
-        int _height;
-
-        Type _viewerType;
+        DRUtils* _utils;
 };
 
 #endif // IMAGEVIEWER_H

@@ -33,3 +33,7 @@ build
 #external
 .vscode
 CMakeLists.txt.user
+build_debug
+build_minsizerel
+build_release
+build_relwithdebug

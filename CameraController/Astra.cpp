@@ -3,7 +3,9 @@
 #include <stdexcept>
 #include <iostream>
 
-Astra::Astra() :  _streams(new openni::VideoStream*[1])
+#include <DRUtils.h>
+
+Astra::Astra() : _utils(new DRUtils())
 {
 }
 
@@ -17,6 +19,11 @@ Astra::~Astra()
 
     if(_color.isValid())
         _color.destroy();
+
+    if(_streams)
+        delete [] _streams;
+
+    delete _utils;
 
     openni::OpenNI::shutdown();
 }
@@ -58,7 +65,7 @@ void Astra::init()
         throw std::runtime_error("Astra.cpp - Failed to create depth video stream.");
     }
 
-    rc = _color.create(_device, openni::SENSOR_DEPTH);
+    rc = _color.create(_device, openni::SENSOR_COLOR);
     if(rc == openni::Status::STATUS_OK)
     {
         rc = _color.start();
@@ -108,15 +115,17 @@ void Astra::init()
     std::cout << "Astra resolution X: " << _width << std::endl;
     std::cout << "Astra resolution Y: " << _height << std::endl;
     std::cout << "Astra FPS: " << _colorVideoMode.getFps() << std::endl;
+
+    _streams = new openni::VideoStream*[2];
+
+    _streams[0] = &_depth;
+    _streams[1] = &_color;
 }
 
-void Astra::process()
+void Astra::run()
 {
-    while(_device.isValid())
+    if(_device.isValid())
     {
-        _streams[0] = &_color;
-        _streams[1] = &_depth;
-
         int changedIndex;
         openni::Status rc = openni::OpenNI::waitForAnyStream(_streams, 2, &changedIndex);
 
@@ -129,11 +138,19 @@ void Astra::process()
         {
             case 0:
                 _depth.readFrame(&_depthFrame); break;
+                if(_depthFrame.isValid())
+                {
+                    _utils->setDepthData(_depthFrame.getData(), _depthFrame.getDataSize());
+                }
             case 1:
-                _color.readFrame(&_colorFrame); break;
+                _color.readFrame(&_colorFrame);
+                if(_colorFrame.isValid())
+                {
+                    _utils->setRGBData(_colorFrame.getData(), _colorFrame.getDataSize());
+                }
+                break;
             default:
                 std::runtime_error("Astra.cpp - Error in wait for streams.");
         }
     }
-    emit finished();
 }
