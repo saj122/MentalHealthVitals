@@ -1,6 +1,6 @@
 #include "Controller.h"
 
-#include "Astra.h"
+#include "OpenNICamera.h"
 
 #include <csignal>
 
@@ -11,24 +11,25 @@ void sigHandler(int s)
     __stop = true;
 }
 
-Controller::Controller() : _astra(nullptr)
+Controller::Controller() : _openNICamera(nullptr)
 {
+    __stop = false;
     std::signal(SIGINT,  sigHandler);
 }
 
 Controller::~Controller()
 {
-    if(_astra)
-        delete _astra;
+    if(_openNICamera)
+        delete _openNICamera;
 }
 
 void Controller::start()
 {
-    _astra = new Astra();
-    _astra->init();
+    _openNICamera = new OpenNICamera();
+    _openNICamera->init();
 
     while(!__stop)
     {
-        _astra->run();
+        _openNICamera->run();
     }
 }

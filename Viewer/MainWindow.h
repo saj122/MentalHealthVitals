@@ -17,9 +17,14 @@ class MainWindow : public QMainWindow
         MainWindow(QWidget *parent = nullptr);
         ~MainWindow();
 
+    private slots:
+        void on_actionExit_triggered();
+        void depthViewerChecked(bool checked);
+
     private:
         Ui::MainWindow *ui;
 
-        ImageViewer* _imageViewer;
+        ImageViewer* _rgbViewer;
+        ImageViewer* _depthViewer;
 };
 #endif // MAINWINDOW_H

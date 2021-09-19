@@ -1,12 +1,11 @@
-#ifndef DEVICE_H
-#define DEVICE_H
+#ifndef CAMERA_H
+#define CAMERA_H
 
-
-class Device
+class Camera
 {
     public:
         virtual void init() = 0;
         virtual void run() = 0;
 };
 
-#endif // DEVICE_H
+#endif // CAMERA_H

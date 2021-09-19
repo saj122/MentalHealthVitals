@@ -11,11 +11,11 @@ find_package(Qt6 COMPONENTS Core REQUIRED)
 
 add_executable(${PROJECT_NAME}
   main.cpp
-  Device.h
-  Astra.h
-  Astra.cpp
+  Camera.h
   Controller.h
   Controller.cpp
+  OpenNICamera.h
+  OpenNICamera.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/OpenNI2/Include)

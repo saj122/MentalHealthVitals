@@ -1,7 +1,7 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
-class Astra;
+class OpenNICamera;
 
 class Controller
 {
@@ -10,7 +10,7 @@ class Controller
         ~Controller();
         void start();
     private:
-        Astra* _astra;
+        OpenNICamera* _openNICamera;
 };
 
 #endif // CONTROLLER_H

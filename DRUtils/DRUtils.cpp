@@ -1,90 +1,102 @@
 #include "DRUtils.h"
 
-#include <QBuffer>
+#include <QSharedMemory>
 
-#include <stdexcept>
 #include <iostream>
 
-DRUtils::DRUtils() : _colorSharedMemory("DeviceRGB"), _depthSharedMemory("DeviceDepth")
+DRUtils::DRUtils() : _colorSharedMemory(new QSharedMemory("DeviceRGB")),
+                     _depthSharedMemory(new QSharedMemory("DeviceDepth")),
+                     _rgbData(new unsigned char[640*480*3]),
+                     _depthData(new unsigned char[640*480])
 {
 
 }
 
 DRUtils::~DRUtils()
 {
-    if (_depthSharedMemory.isAttached())
+    if (_depthSharedMemory->isAttached())
     {
-        _depthSharedMemory.detach();
+        _depthSharedMemory->detach();
     }
 
-    if (_colorSharedMemory.isAttached())
+    if (_colorSharedMemory->isAttached())
     {
-        _colorSharedMemory.detach();
+        _colorSharedMemory->detach();
     }
+
+    delete _colorSharedMemory;
+    delete _depthSharedMemory;
+
+    delete[] _rgbData;
+    delete[] _depthData;
 }
 
 void DRUtils::setRGBData(const void* data, int size)
 {
-    if (_colorSharedMemory.isAttached())
+    if (_colorSharedMemory->isAttached())
     {
-        _colorSharedMemory.detach();
+        _colorSharedMemory->detach();
     }
 
-    if(!_colorSharedMemory.create(size))
+    if(!_colorSharedMemory->create(size))
     {
-        std::runtime_error("DRUtils.cpp - Unable to create shared color memory segment.");
+        std::cout << "DRUtils.cpp - Unable to create shared color memory segment." << std::endl;
         return;
     }
 
-    _colorSharedMemory.lock();
-    void* to = _colorSharedMemory.data();
-    memcpy(to, data, qMin(_colorSharedMemory.size(), size));
-    _colorSharedMemory.unlock();
+    _colorSharedMemory->lock();
+    void* to = _colorSharedMemory->data();
+    memcpy(to, data, qMin(_colorSharedMemory->size(), size));
+    _colorSharedMemory->unlock();
 }
 
 void DRUtils::setDepthData(const void* data, int size)
 {
-    if (_depthSharedMemory.isAttached())
+    if (_depthSharedMemory->isAttached())
     {
-        _depthSharedMemory.detach();
+        _depthSharedMemory->detach();
     }
 
-    if(!_depthSharedMemory.create(size))
+    if(!_depthSharedMemory->create(size))
     {
-        std::runtime_error("DRUtils.cpp - Unable to create shared depth memory segment.");
+        std::cout << "DRUtils.cpp - Unable to create shared depth memory segment." << std::endl;
         return;
     }
 
-    _depthSharedMemory.lock();
-    void* to = _depthSharedMemory.data();
-    memcpy(to, data, qMin(_depthSharedMemory.size(), size));
-    _depthSharedMemory.unlock();
+    _depthSharedMemory->lock();
+    void* to = _depthSharedMemory->data();
+    memcpy(to, data, qMin(_depthSharedMemory->size(), size));
+    _depthSharedMemory->unlock();
 }
 
-const void* DRUtils::getRGBData()
+const unsigned char* DRUtils::getRGBData()
 {
-    if(!_colorSharedMemory.attach())
+    if(!_colorSharedMemory->attach())
     {
-        std::runtime_error("DRUtils.cpp - Failed to attach to RGB shared memory.");
+        std::cout << "DRUtils.cpp - Failed to attach to RGB shared memory." << std::endl;
     }
 
-    _colorSharedMemory.lock();
-    const void* data = _colorSharedMemory.constData();
-    _colorSharedMemory.unlock();
+    _colorSharedMemory->lock();
+    memcpy(_rgbData, _colorSharedMemory->data(), _colorSharedMemory->size());
+    _colorSharedMemory->unlock();
 
-    return data;
+    _colorSharedMemory->detach();
+
+    return _rgbData;
 }
 
-const void* DRUtils::getDepthData()
+const unsigned char* DRUtils::getDepthData()
 {
-    if(!_depthSharedMemory.attach())
+    if(!_depthSharedMemory->attach())
     {
-        std::runtime_error("DRUtils.cpp - Failed to attach to depth shared memory.");
+        std::cout << "DRUtils.cpp - Failed to attach to depth shared memory." << std::endl;
     }
 
-    _depthSharedMemory.lock();
-    const void* data = _depthSharedMemory.constData();
-    _depthSharedMemory.unlock();
+    _depthSharedMemory->lock();
+    memcpy(_depthData, _depthSharedMemory->data(), _depthSharedMemory->size());
+    _depthSharedMemory->unlock();
 
-    return data;
+    _depthSharedMemory->detach();
+
+    return _depthData;
 }
