@@ -30,3 +30,4 @@ elseif(UNIX)
     target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/OpenNI2/Linux/Redist/libOpenNI2.so)
 endif()
 
+add_dependencies(${PROJECT_NAME} DRUtils)
