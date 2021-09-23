@@ -10,10 +10,8 @@ find_package(QT NAMES Qt6 COMPONENTS Core REQUIRED)
 find_package(Qt6 COMPONENTS Core REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
-  DRUtils.cpp
-  DRUtils.h
+  Memory.cpp
+  Memory.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core)
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE DRUTILS_LIBRARY)

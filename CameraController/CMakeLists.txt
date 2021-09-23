@@ -22,7 +22,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/O
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/DRUtils)
 
 target_link_libraries(${PROJECT_NAME} Qt6::Core)
-target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/DRUtils/libDRUtils.a)
+target_link_libraries(${PROJECT_NAME} DRUtils)
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/OpenNI2/Windows/Lib/OpenNI2.lib)

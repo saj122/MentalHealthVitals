@@ -3,28 +3,36 @@
 
 #include <QMainWindow>
 
-QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
-QT_END_NAMESPACE
 
-class ImageViewer;
-
-class MainWindow : public QMainWindow
+namespace MHV
 {
-    Q_OBJECT
+    class ImageViewer;
+    class PointCloudViewer;
+}
 
-    public:
-        MainWindow(QWidget *parent = nullptr);
-        ~MainWindow();
+namespace MHV
+{
+    class MainWindow : public QMainWindow
+    {
+        Q_OBJECT
 
-    private slots:
-        void on_actionExit_triggered();
-        void depthViewerChecked(bool checked);
+        public:
+            MainWindow(QWidget *parent = nullptr);
+            ~MainWindow();
 
-    private:
-        Ui::MainWindow *ui;
+        private slots:
+            void on_actionExit_triggered();
+            void depthViewerChecked(bool checked);
+            void pointCloudViewerChecked(bool checked);
 
-        ImageViewer* _rgbViewer;
-        ImageViewer* _depthViewer;
-};
+        private:
+            Ui::MainWindow *ui;
+
+            ImageViewer* _rgbViewer;
+            ImageViewer* _depthViewer;
+            PointCloudViewer* _pointCloudViewer;
+    };
+}
+
 #endif // MAINWINDOW_H

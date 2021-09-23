@@ -21,11 +21,12 @@ set(PROJECT_SOURCES
         MainWindow.ui
         ImageViewer.cpp
         ImageViewer.h
+        PointCloudViewer.h
+        PointCloudViewer.cpp
 )
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/OpenNI2/Include)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/DRUtils)
 
 target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
@@ -33,10 +34,4 @@ target_link_libraries(${PROJECT_NAME} Qt6::Core)
 target_link_libraries(${PROJECT_NAME} Qt6::Gui)
 target_link_libraries(${PROJECT_NAME} Qt6::OpenGL)
 target_link_libraries(${PROJECT_NAME} Qt6::OpenGLWidgets)
-target_link_libraries(${PROJECT_NAME} ${CMAKE_BINARY_DIR}/DRUtils/libDRUtils.a)
-
-if(WIN32)
-    target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/OpenNI2/Windows/Lib/OpenNI2.lib)
-elseif(UNIX)
-    target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/OpenNI2/Linux/Redist/libOpenNI2.so)
-endif()
+target_link_libraries(${PROJECT_NAME} DRUtils)

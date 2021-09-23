@@ -1,40 +1,38 @@
 #include "ImageViewer.h"
 
-#include "DRUtils.h"
+#include "Memory.h"
 
 #include <QOpenGLShader>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 
-#include <iostream>
+#define WIDTH 640
+#define HEIGHT 480
 
-#include <OpenNI.h>
-
-ImageViewer::ImageViewer(Type type) : _utils(new DRUtils()), _viewerType(type)
+MHV::ImageViewer::ImageViewer(Type type) : _utils(new Memory(WIDTH, HEIGHT)), _viewerType(type)
 {
-    startTimer(32);
+    startTimer(10);
 }
 
-ImageViewer::~ImageViewer()
+MHV::ImageViewer::~ImageViewer()
 {
-    delete _utils;
+    makeCurrent();
     _vbo.destroy();
-    delete _program;
-    delete _texture;
+    _texture->destroy();
 }
 
-void ImageViewer::timerEvent(QTimerEvent* event)
+void MHV::ImageViewer::timerEvent(QTimerEvent* event)
 {
     update();
 }
 
-void ImageViewer::initializeGL()
+void MHV::ImageViewer::initializeGL()
 {
     initializeOpenGLFunctions();
 
     makeImageTexture();
 
-    QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
+    std::unique_ptr<QOpenGLShader> vshader = std::make_unique<QOpenGLShader>(QOpenGLShader::Vertex, this);
     const char *vsrc =
         "#version 120\n"
         "attribute vec2 aPos;\n"
@@ -47,7 +45,7 @@ void ImageViewer::initializeGL()
         "}\n";
     vshader->compileSourceCode(vsrc);
 
-    QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
+    std::unique_ptr<QOpenGLShader> fshader = std::make_unique<QOpenGLShader>(QOpenGLShader::Fragment, this);
     const char *fsrc =
         "#version 120\n"
         "varying vec2 textureCoords;\n"
@@ -58,9 +56,9 @@ void ImageViewer::initializeGL()
         "}\n";
     fshader->compileSourceCode(fsrc);
 
-    _program = new QOpenGLShaderProgram;
-    _program->addShader(vshader);
-    _program->addShader(fshader);
+    _program = std::make_unique<QOpenGLShaderProgram>();
+    _program->addShader(vshader.get());
+    _program->addShader(fshader.get());
     _program->bindAttributeLocation("aPos", 0);
     _program->bindAttributeLocation("aTexCoord", 1);
     _program->link();
@@ -69,11 +67,11 @@ void ImageViewer::initializeGL()
     _program->setUniformValue("texture", 0);
 }
 
-void ImageViewer::paintGL()
+void MHV::ImageViewer::paintGL()
 {
-    QColor clearColor = Qt::white;
+    QColor clearColor = Qt::black;
     glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
    _program->enableAttributeArray(0);
    _program->enableAttributeArray(1);
@@ -82,58 +80,59 @@ void ImageViewer::paintGL()
 
    if(_texture)
    {
+       _texture->release();
        if(_viewerType == Type::RGB)
        {
-           _texture->setData(QImage(_utils->getRGBData(), 640, 480, QImage::Format::Format_RGB888));
+           _texture->setData(QOpenGLTexture::PixelFormat::RGB, QOpenGLTexture::PixelType::UInt8, _utils->getRGBData());
        }
        else if(_viewerType == Type::DEPTH)
        {
-           _texture->setData(QImage(_utils->getDepthData(), 640, 480,QImage::Format::Format_Grayscale16));
+           _texture->setData(QOpenGLTexture::PixelFormat::Luminance, QOpenGLTexture::PixelType::UInt16, _utils->getDepthData());
        }
        _texture->bind();
    }
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void ImageViewer::resizeGL(int w, int h)
+void MHV::ImageViewer::resizeGL(int w, int h)
 {
     int side = qMin(w, h);
     glViewport((w - side)/2, (h - side)/2, side, side);
 }
 
-void ImageViewer::makeImageTexture()
+void MHV::ImageViewer::makeImageTexture()
 {
     if(_viewerType == Type::RGB)
     {
-        _texture = new QOpenGLTexture(QImage(_utils->getRGBData(), 640, 480, QImage::Format::Format_RGB888));
+        _texture = std::make_unique<QOpenGLTexture>(QImage(_utils->getRGBData(), 640, 480, QImage::Format::Format_RGB888).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
     }
     else if(_viewerType == Type::DEPTH)
     {
-        _texture = new QOpenGLTexture(QImage(_utils->getDepthData(), 640, 480, QImage::Format::Format_Grayscale16));
+        _texture = std::make_unique<QOpenGLTexture>(QImage(_utils->getDepthData(), 640, 480, QImage::Format::Format_Grayscale16).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
     }
 
     QVector<GLfloat> vertData;
     vertData.append(-1.0);
     vertData.append(-1.0);
-    vertData.append(0.0);
-    vertData.append(0.0);
+    vertData.append(1.0);
+    vertData.append(1.0);
 
     vertData.append(1.0);
     vertData.append(-1.0);
-    vertData.append(1.0);
     vertData.append(0.0);
+    vertData.append(1.0);
 
     vertData.append(-1.0);
     vertData.append(1.0);
-    vertData.append(0.0);
     vertData.append(1.0);
+    vertData.append(0.0);
 
     vertData.append(1.0);
     vertData.append(1.0);
-    vertData.append(1.0);
-    vertData.append(1.0);
+    vertData.append(0.0);
+    vertData.append(0.0);
 
     _vbo.create();
     _vbo.bind();
-    _vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
+    _vbo.allocate(vertData.constData(), (int)(vertData.count() * sizeof(GLfloat)));
 }

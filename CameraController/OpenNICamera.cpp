@@ -3,13 +3,18 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <DRUtils.h>
+#include <Memory.h>
 
-OpenNICamera::OpenNICamera() : _utils(new DRUtils())
+#define WIDTH 640
+#define HEIGHT 480
+
+MHV::OpenNICamera::OpenNICamera() : _utils(new Memory(WIDTH,HEIGHT)),
+                                    _streams(new openni::VideoStream*[2]())
 {
+
 }
 
-OpenNICamera::~OpenNICamera()
+MHV::OpenNICamera::~OpenNICamera()
 {
     if(_device.isValid())
         _device.close();
@@ -20,15 +25,10 @@ OpenNICamera::~OpenNICamera()
     if(_color.isValid())
         _color.destroy();
 
-    if(_streams)
-        delete [] _streams;
-
-    delete _utils;
-
     openni::OpenNI::shutdown();
 }
 
-void OpenNICamera::init()
+void MHV::OpenNICamera::init()
 {
     openni::Status rc = openni::Status::STATUS_OK;
 
@@ -46,7 +46,7 @@ void OpenNICamera::init()
         throw std::runtime_error("OpenNICamera.cpp - Failed to open device.");
     }
 
-    _device.setImageRegistrationMode(openni::IMAGE_REGISTRATION_OFF);
+    _device.setImageRegistrationMode(openni::ImageRegistrationMode::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
 
     rc = _depth.create(_device, openni::SENSOR_DEPTH);
     if(rc == openni::Status::STATUS_OK)
@@ -92,11 +92,11 @@ void OpenNICamera::init()
     _colorVideoMode = _color.getVideoMode();
 
     _colorVideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_RGB888);
-    _depthVideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_GRAY8);
+    _depthVideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_100_UM);
     _colorVideoMode.setFps(30);
     _depthVideoMode.setFps(30);
-    _colorVideoMode.setResolution(640,480);
-    _depthVideoMode.setResolution(640,480);
+    _colorVideoMode.setResolution(WIDTH,HEIGHT);
+    _depthVideoMode.setResolution(WIDTH,HEIGHT);
 
     _depth.setVideoMode(_depthVideoMode);
     _color.setVideoMode(_colorVideoMode);
@@ -113,38 +113,80 @@ void OpenNICamera::init()
     }
     else
     {
-        std::runtime_error("Astra.cpp - Depth and color resolution are not the same.");
+        std::runtime_error("OpenNICamera.cpp - Depth and color resolution are not the same.");
     }
 
-    std::cout << "Astra resolution X: " << _width << std::endl;
-    std::cout << "Astra resolution Y: " << _height << std::endl;
-    std::cout << "Astra FPS: " << _colorVideoMode.getFps() << std::endl;
+    std::cout << "OpenNICamera resolution X: " << _width << std::endl;
+    std::cout << "OpenNICamera resolution Y: " << _height << std::endl;
+    std::cout << "OpenNICamera FPS: " << _colorVideoMode.getFps() << std::endl;
 
-    _streams = new openni::VideoStream*[2];
-
-    _streams[0] = &_depth;
-    _streams[1] = &_color;
+    _streams.get()[0] = &_depth;
+    _streams.get()[1] = &_color;
 }
 
-void OpenNICamera::run()
+const std::vector<float> MHV::OpenNICamera::calculatePointCloud(const uint16_t* depth)
 {
-    int changedIndex;
-    openni::Status rc = openni::OpenNI::waitForAnyStream(_streams, 2, &changedIndex);
+    std::vector<float> points;
+    points.reserve(_width*_height*3);
 
-    if (rc != openni::STATUS_OK)
+#pragma omp parallel for
+    for( uint32_t y = 0; y < _height; y++ )
     {
-        std::runtime_error("OpenNICamera.cpp - Wait for streams failed.");
+        for( uint32_t x = 0; x < _width; x++ )
+        {
+            const uint16_t z = depth[y * _width + x];
+            if( !z )
+            {
+                continue;
+            }
+
+            float wx, wy, wz;
+            openni::Status rc = openni::CoordinateConverter::convertDepthToWorld( _depth, static_cast<float>( x ), static_cast<float>( y ), static_cast<float>( z ), &wx, &wy, &wz );
+            if(rc != openni::STATUS_OK)
+            {
+                std::runtime_error("OpenNICamera.cpp - Can't convert depth to world.");
+            }
+
+            points.push_back(wx);
+            points.push_back(wy);
+            points.push_back(wz);
+        }
     }
 
-    _depth.readFrame(&_depthFrame);
-    if(_depthFrame.isValid())
-    {
-        _utils->setDepthData(_depthFrame.getData(), _depthFrame.getDataSize());
-    }
+    return points;
+}
 
-    _color.readFrame(&_colorFrame);
-    if(_colorFrame.isValid())
+void MHV::OpenNICamera::run()
+{
+    if(isValid())
     {
-        _utils->setRGBData(_colorFrame.getData(), _colorFrame.getDataSize());
+        int changedIndex;
+        openni::Status rc = openni::OpenNI::waitForAnyStream(_streams.get(), 2, &changedIndex);
+
+        if (rc != openni::STATUS_OK)
+        {
+            std::runtime_error("OpenNICamera.cpp - Wait for streams failed.");
+        }
+
+        _depth.readFrame(&_depthFrame);
+        if(_depthFrame.isValid())
+        {
+            _utils->setDepthData(_depthFrame.getData(), _depthFrame.getDataSize());
+
+            const uint16_t* depth = static_cast<const uint16_t*>( _depthFrame.getData() );
+            std::vector<float> points = calculatePointCloud(depth);
+            _utils->setPointCloudData(points.data(), points.size()*sizeof(float));
+        }
+
+        _color.readFrame(&_colorFrame);
+        if(_colorFrame.isValid())
+        {
+            _utils->setRGBData(_colorFrame.getData(), _colorFrame.getDataSize());
+        }
     }
+}
+
+bool MHV::OpenNICamera::isValid()
+{
+    return _device.isValid();
 }

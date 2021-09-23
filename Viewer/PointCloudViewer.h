@@ -1,10 +1,11 @@
-#ifndef IMAGEVIEWER_H
-#define IMAGEVIEWER_H
+#ifndef POINTCLOUDVIEWER_H
+#define POINTCLOUDVIEWER_H
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
 #include <QOpenGLFunctions>
+#include <QMatrix4x4>
 
 #include <memory>
 
@@ -18,24 +19,18 @@ namespace MHV
 
 namespace MHV
 {
-    class ImageViewer : public QOpenGLWidget, protected QOpenGLFunctions
+    class PointCloudViewer : public QOpenGLWidget, protected QOpenGLFunctions
     {
         public:
-            enum class Type
-            {
-                RGB,
-                DEPTH
-            };
-        public:
-            ImageViewer(Type type = Type::RGB);
-            ~ImageViewer();
+            PointCloudViewer();
+            ~PointCloudViewer();
         protected:
             void initializeGL() override;
             void resizeGL(int w, int h) override;
             void paintGL() override;
             void timerEvent(QTimerEvent* event) override;
         private:
-            void makeImageTexture();
+            void makePointCloud();
         private:
             QOpenGLBuffer _vbo;
             std::unique_ptr<QOpenGLShaderProgram> _program;
@@ -43,8 +38,8 @@ namespace MHV
 
             std::unique_ptr<MHV::Memory> _utils;
 
-            Type _viewerType;
+            QMatrix4x4 _projection;
     };
 }
 
-#endif // IMAGEVIEWER_H
+#endif // POINTCLOUDVIEWER_H

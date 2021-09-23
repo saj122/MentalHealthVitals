@@ -11,24 +11,24 @@ void sigHandler(int s)
     __stop = true;
 }
 
-Controller::Controller() : _openNICamera(nullptr)
+MHV::Controller::Controller() : _openNICamera(nullptr)
 {
     __stop = false;
     std::signal(SIGINT,  sigHandler);
 }
 
-Controller::~Controller()
+MHV::Controller::~Controller()
 {
     if(_openNICamera)
         delete _openNICamera;
 }
 
-void Controller::start()
+void MHV::Controller::start()
 {
-    _openNICamera = new OpenNICamera();
+    _openNICamera = new MHV::OpenNICamera();
     _openNICamera->init();
 
-    while(!__stop)
+    while(!__stop || _openNICamera->isValid())
     {
         _openNICamera->run();
     }

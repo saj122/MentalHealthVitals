@@ -5,29 +5,42 @@
 
 #include <OpenNI.h>
 
-class DRUtils;
+#include <vector>
+#include <memory>
 
-class OpenNICamera : Camera
+namespace MHV
 {
-    public:
-        OpenNICamera();
-        ~OpenNICamera();
-        void init();
-        void run();
-    private:
-        DRUtils* _utils;
+    class Memory;
+}
 
-        openni::Device _device;
-        openni::VideoStream _depth;
-        openni::VideoStream _color;
-        openni::VideoStream** _streams;
-        openni::VideoFrameRef _depthFrame;
-        openni::VideoFrameRef _colorFrame;
-        openni::VideoMode _depthVideoMode;
-        openni::VideoMode _colorVideoMode;
+namespace MHV
+{
+    class OpenNICamera : Camera
+    {
+        public:
+            OpenNICamera();
+            ~OpenNICamera();
+            void init();
+            void run();
+            bool isValid();
+        private:
+            const std::vector<float> calculatePointCloud(const uint16_t* depth);
+        private:
+            std::unique_ptr<Memory> _utils;
 
-        int _width;
-        int _height;
-};
+            openni::Device _device;
+            openni::VideoStream _depth;
+            openni::VideoStream _color;
+            std::unique_ptr<openni::VideoStream*> _streams;
+            openni::VideoFrameRef _depthFrame;
+            openni::VideoFrameRef _colorFrame;
+            openni::VideoMode _depthVideoMode;
+            openni::VideoMode _colorVideoMode;
+
+            int _width;
+            int _height;
+    };
+}
+
 
 #endif // OPENNICAMERA_H
