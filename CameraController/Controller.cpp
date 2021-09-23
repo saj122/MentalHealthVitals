@@ -19,16 +19,15 @@ MHV::Controller::Controller() : _openNICamera(nullptr)
 
 MHV::Controller::~Controller()
 {
-    if(_openNICamera)
-        delete _openNICamera;
+
 }
 
 void MHV::Controller::start()
 {
-    _openNICamera = new MHV::OpenNICamera();
+    _openNICamera = std::make_unique<MHV::OpenNICamera>();
     _openNICamera->init();
 
-    while(!__stop || _openNICamera->isValid())
+    while(!__stop && _openNICamera->isValid())
     {
         _openNICamera->run();
     }

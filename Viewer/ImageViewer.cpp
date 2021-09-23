@@ -11,7 +11,7 @@
 
 MHV::ImageViewer::ImageViewer(Type type) : _utils(new Memory(WIDTH, HEIGHT)), _viewerType(type)
 {
-    startTimer(10);
+    startTimer(30);
 }
 
 MHV::ImageViewer::~ImageViewer()
@@ -19,6 +19,7 @@ MHV::ImageViewer::~ImageViewer()
     makeCurrent();
     _vbo.destroy();
     _texture->destroy();
+    doneCurrent();
 }
 
 void MHV::ImageViewer::timerEvent(QTimerEvent* event)

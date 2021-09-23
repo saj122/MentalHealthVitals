@@ -10,7 +10,6 @@
 #include <memory>
 
 class QOpenGLShaderProgram;
-class QOpenGLTexture;
 
 namespace MHV
 {
@@ -21,6 +20,8 @@ namespace MHV
 {
     class PointCloudViewer : public QOpenGLWidget, protected QOpenGLFunctions
     {
+        Q_OBJECT
+
         public:
             PointCloudViewer();
             ~PointCloudViewer();
@@ -28,17 +29,18 @@ namespace MHV
             void initializeGL() override;
             void resizeGL(int w, int h) override;
             void paintGL() override;
-            void timerEvent(QTimerEvent* event) override;
+            void mouseMoveEvent(QMouseEvent *e) override;
+            void timerEvent(QTimerEvent* e) override;
         private:
             void makePointCloud();
         private:
             QOpenGLBuffer _vbo;
             std::unique_ptr<QOpenGLShaderProgram> _program;
-            std::unique_ptr<QOpenGLTexture> _texture;
 
             std::unique_ptr<MHV::Memory> _utils;
 
-            QMatrix4x4 _projection;
+            QMatrix4x4 _projectionMat;
+            QMatrix4x4 _viewMat;
     };
 }
 

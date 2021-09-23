@@ -1,6 +1,8 @@
 #ifndef CONTROLLER_H
 #define CONTROLLER_H
 
+#include <memory>
+
 namespace MHV
 {
     class OpenNICamera;
@@ -15,7 +17,7 @@ namespace MHV
             ~Controller();
             void start();
         private:
-            MHV::OpenNICamera* _openNICamera;
+            std::unique_ptr<MHV::OpenNICamera> _openNICamera;
     };
 }
 

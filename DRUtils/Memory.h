@@ -23,9 +23,9 @@ namespace MHV
             std::unique_ptr<QSharedMemory> _depthSharedMemory;
             std::unique_ptr<QSharedMemory> _pointCloudSharedMemory;
 
-            std::unique_ptr<unsigned char[]> _depthData;
-            std::unique_ptr<unsigned char[]> _rgbData;
-            std::unique_ptr<float[]> _pointCloudData;
+            unsigned char* _depthData;
+            unsigned char* _rgbData;
+            float* _pointCloudData;
     };
 }
 
