@@ -7,7 +7,6 @@
 #include <QOpenGLTexture>
 #include <QMouseEvent>
 #include <QVector>
-#include <QtMath>
 
 #include <utility>
 #include <iostream>
@@ -18,6 +17,8 @@
 MHV::PointCloudViewer::PointCloudViewer() : _utils(new Memory(WIDTH, HEIGHT))
 {
     startTimer(30);
+
+    _viewMat.lookAt(QVector3D(0.0,0.0,0.0), QVector3D(0.0,0.0,10.0),QVector3D(0.0,1.0,0.0));
 }
 
 MHV::PointCloudViewer::~PointCloudViewer()
@@ -50,8 +51,8 @@ void MHV::PointCloudViewer::initializeGL()
 
     QOpenGLShader* vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
     const char *vsrc =
-        "#version 120\n"
-        "attribute vec3 aPos;\n"
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
         "uniform mat4 vp;\n"
         "void main()\n"
         "{\n"
@@ -62,10 +63,11 @@ void MHV::PointCloudViewer::initializeGL()
 
     QOpenGLShader* fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
     const char *fsrc =
-        "#version 120\n"
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
         "void main()\n"
         "{\n"
-        "    gl_FragColor = vec4(0.0,0.0,1.0,1.0);\n"
+        "    FragColor = vec4(0.0,0.0,1.0,1.0);\n"
         "}\n";
     fshader->compileSourceCode(fsrc);
 
@@ -87,6 +89,8 @@ void MHV::PointCloudViewer::paintGL()
    _program->enableAttributeArray(0);
    _program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
 
+   _program->setUniformValue("vp", _projectionMat * _viewMat);
+
    glDrawArrays(GL_POINTS, 0, WIDTH*HEIGHT);
 }
 
@@ -99,9 +103,6 @@ void MHV::PointCloudViewer::resizeGL(int w, int h)
     _projectionMat.setToIdentity();
 
     _projectionMat.perspective(fov, aspect, zNear, zFar);
-
-    _viewMat.lookAt(QVector3D(0.0,0.0,0.0), QVector3D(0.0,0.0,10.0),QVector3D(0.0,1.0,0.0));
-    _program->setUniformValue("vp", _projectionMat * _viewMat);
 }
 
 void MHV::PointCloudViewer::makePointCloud()

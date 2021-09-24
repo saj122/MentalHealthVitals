@@ -4,7 +4,7 @@
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 #include <QMatrix4x4>
 
 #include <memory>
@@ -18,7 +18,7 @@ namespace MHV
 
 namespace MHV
 {
-    class PointCloudViewer : public QOpenGLWidget, protected QOpenGLFunctions
+    class PointCloudViewer : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
     {
         Q_OBJECT
 
