@@ -1,19 +1,19 @@
-#include <iostream>
-
 #include "Controller.h"
+
+#define GOOGLE_STRIP_LOG 1
+#include <glog/logging.h>
 
 int main(int argc, char *argv[])
 {
-    MHV::Controller ct;
-    try
-    {
-        ct.start();
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return EXIT_FAILURE;
-    }
+    google::InitGoogleLogging(argv[0]);
 
-    return EXIT_SUCCESS;
+#ifndef NDEBUG
+    FLAGS_logtostderr = 1;
+    FLAGS_minloglevel = 0;
+#endif
+
+    MHV::Controller ct;
+    ct.start();
+
+    return 0;
 }

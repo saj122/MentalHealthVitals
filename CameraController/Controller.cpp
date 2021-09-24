@@ -4,6 +4,8 @@
 
 #include <csignal>
 
+#include <glog/logging.h>
+
 volatile bool __stop;
 
 void sigHandler(int s)
@@ -26,6 +28,8 @@ void MHV::Controller::start()
 {
     _openNICamera = std::make_unique<MHV::OpenNICamera>();
     _openNICamera->init();
+
+    LOG(INFO) << "Camera initialized and starting.";
 
     while(!__stop && _openNICamera->isValid())
     {

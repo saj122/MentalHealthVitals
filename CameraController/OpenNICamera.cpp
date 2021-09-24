@@ -1,9 +1,8 @@
 #include "OpenNICamera.h"
 
-#include <stdexcept>
-#include <iostream>
-
 #include <Memory.h>
+
+#include <glog/logging.h>
 
 #define WIDTH 640
 #define HEIGHT 480
@@ -36,14 +35,14 @@ void MHV::OpenNICamera::init()
     if(rc != openni::Status::STATUS_OK)
     {
         openni::OpenNI::shutdown();
-        throw std::runtime_error("OpenNICamera.cpp - Failed to initialize OpenNI.");
+        LOG(ERROR) << "Failed to open device.";
     }
 
     rc = _device.open(openni::ANY_DEVICE);
     if(rc != openni::Status::STATUS_OK)
     {
         openni::OpenNI::shutdown();
-        throw std::runtime_error("OpenNICamera.cpp - Failed to open device.");
+        LOG(ERROR) << "Failed to open device.";
     }
 
     _device.setImageRegistrationMode(openni::ImageRegistrationMode::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
@@ -56,13 +55,13 @@ void MHV::OpenNICamera::init()
         {
             _depth.destroy();
             openni::OpenNI::shutdown();
-            throw std::runtime_error("OpenNICamera.cpp - Failed to start depth stream.");
+            LOG(ERROR) << "Failed to start depth stream.";
         }
     }
     else
     {
         openni::OpenNI::shutdown();
-        throw std::runtime_error("OpenNICamera.cpp - Failed to create depth video stream.");
+        LOG(ERROR) << "Failed to create depth video stream.";
     }
 
     rc = _color.create(_device, openni::SENSOR_COLOR);
@@ -73,19 +72,19 @@ void MHV::OpenNICamera::init()
         {
             _color.destroy();
             openni::OpenNI::shutdown();
-            throw std::runtime_error("OpenNICamera.cpp - Failed to start color stream.");
+            LOG(ERROR) << "Failed to start color stream.";
         }
     }
     else
     {
         openni::OpenNI::shutdown();
-        throw std::runtime_error("OpenNICamera.cpp - Failed to create color video stream.");
+        LOG(ERROR) << "Failed to create color video stream.";
     }
 
     if (!_depth.isValid() && !_color.isValid())
     {
         openni::OpenNI::shutdown();
-        throw std::runtime_error("OpenNICamera.cpp - No valid streams.");
+        LOG(ERROR) << "No valid streams.";
     }
 
     _depthVideoMode = _depth.getVideoMode();
@@ -113,12 +112,12 @@ void MHV::OpenNICamera::init()
     }
     else
     {
-        std::runtime_error("OpenNICamera.cpp - Depth and color resolution are not the same.");
+        LOG(ERROR) << "Depth and color resolution are not the same.";
     }
 
-    std::cout << "OpenNICamera resolution X: " << _width << std::endl;
-    std::cout << "OpenNICamera resolution Y: " << _height << std::endl;
-    std::cout << "OpenNICamera FPS: " << _colorVideoMode.getFps() << std::endl;
+    LOG(INFO) << "Resolution X: " << _width;
+    LOG(INFO) << "Resolution Y: " << _height;
+    LOG(INFO) << "FPS: " << _colorVideoMode.getFps();
 
     _streams.get()[0] = &_depth;
     _streams.get()[1] = &_color;
@@ -144,7 +143,7 @@ const std::vector<float> MHV::OpenNICamera::calculatePointCloud(const uint16_t* 
             openni::Status rc = openni::CoordinateConverter::convertDepthToWorld( _depth, static_cast<float>( x ), static_cast<float>( y ), static_cast<float>( z ), &wx, &wy, &wz );
             if(rc != openni::STATUS_OK)
             {
-                std::runtime_error("OpenNICamera.cpp - Can't convert depth to world.");
+                LOG(ERROR) << "Can't convert depth to world.";
             }
 
             points.push_back(wx);
@@ -165,23 +164,23 @@ void MHV::OpenNICamera::run()
 
         if (rc != openni::STATUS_OK)
         {
-            std::runtime_error("OpenNICamera.cpp - Wait for streams failed.");
+            LOG(ERROR) << "Wait for streams failed.";
         }
 
         _depth.readFrame(&_depthFrame);
         if(_depthFrame.isValid())
         {
-            _utils->setDepthData(_depthFrame.getData(), _depthFrame.getDataSize());
+            _utils->setDepthData(_depthFrame.getData());
 
             const uint16_t* depth = static_cast<const uint16_t*>( _depthFrame.getData() );
             std::vector<float> points = calculatePointCloud(depth);
-            _utils->setPointCloudData(points.data(), points.size()*sizeof(float));
+            _utils->setPointCloudData(points.data());
         }
 
         _color.readFrame(&_colorFrame);
         if(_colorFrame.isValid())
         {
-            _utils->setRGBData(_colorFrame.getData(), _colorFrame.getDataSize());
+            _utils->setRGBData(_colorFrame.getData());
         }
     }
 }

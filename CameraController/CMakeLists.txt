@@ -6,8 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 COMPONENTS Core REQUIRED)
-find_package(Qt6 COMPONENTS Core REQUIRED)
+find_package(glog REQUIRED)
 
 add_executable(${PROJECT_NAME}
   main.cpp
@@ -21,8 +20,8 @@ add_executable(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/OpenNI2/Include)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/DRUtils)
 
-target_link_libraries(${PROJECT_NAME} Qt6::Core)
 target_link_libraries(${PROJECT_NAME} DRUtils)
+target_link_libraries(${PROJECT_NAME} glog::glog)
 
 if(WIN32)
     target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/OpenNI2/Windows/Lib/OpenNI2.lib)

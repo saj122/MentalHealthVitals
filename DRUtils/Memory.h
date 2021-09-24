@@ -1,10 +1,6 @@
 #ifndef MEMORY_H
 #define MEMORY_H
 
-#include <memory>
-
-class QSharedMemory;
-
 namespace MHV
 {
     class Memory
@@ -12,20 +8,22 @@ namespace MHV
         public:
             Memory(int width, int height);
             ~Memory();
-            void setRGBData(const void* data, int size);
-            void setDepthData(const void* data, int size);
-            void setPointCloudData(const float* data, int size);
+            void setRGBData(const void* data);
+            void setDepthData(const void* data);
+            void setPointCloudData(const float* data);
             const unsigned char* getRGBData();
             const unsigned char* getDepthData();
             const float* getPointCloudData();
         private:
-            std::unique_ptr<QSharedMemory> _colorSharedMemory;
-            std::unique_ptr<QSharedMemory> _depthSharedMemory;
-            std::unique_ptr<QSharedMemory> _pointCloudSharedMemory;
-
             unsigned char* _depthData;
             unsigned char* _rgbData;
             float* _pointCloudData;
+
+            int _rgbSharedMemory;
+            int _depthSharedMemory;
+            int _pointCloudSharedMemory;
+            int _width;
+            int _height;
     };
 }
 

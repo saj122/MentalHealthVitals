@@ -1,141 +1,108 @@
 #include "Memory.h"
 
-#include <QSharedMemory>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 
-#include <iostream>
+#include <cstring>
 
-MHV::Memory::Memory(int width, int height) : _colorSharedMemory(new QSharedMemory("DeviceRGB")),
-                     _depthSharedMemory(new QSharedMemory("DeviceDepth")),
-                     _pointCloudSharedMemory(new QSharedMemory("DevicePointCloud"))
+#include <glog/logging.h>
+
+
+
+MHV::Memory::Memory(int width, int height) : _width(width),
+                                             _height(height),
+                                             _rgbData(new unsigned char[width*height*3]),
+                                             _depthData(new unsigned char[width*height*2]),
+                                             _pointCloudData(new float[width*height*3])
 {
-    _rgbData = new unsigned char[width*height*3];
-    _depthData = new unsigned char[width*height*2];
-    _pointCloudData = new float[width*height*3];
+
 }
 
 MHV::Memory::~Memory()
 {
-    if (_depthSharedMemory->isAttached())
-    {
-        _depthSharedMemory->detach();
-    }
+    delete[] _rgbData;
+    delete[] _depthData;
+    delete[] _pointCloudData;
 
-    if (_colorSharedMemory->isAttached())
-    {
-        _colorSharedMemory->detach();
-    }
-
-    if (_pointCloudSharedMemory->isAttached())
-    {
-        _pointCloudSharedMemory->detach();
-    }
-
-    delete _rgbData;
-    delete _depthData;
-    delete _pointCloudData;
+    shmctl(_rgbSharedMemory,IPC_RMID,NULL);
+    shmctl(_depthSharedMemory,IPC_RMID,NULL);
+    shmctl(_pointCloudSharedMemory,IPC_RMID,NULL);
 }
 
-void MHV::Memory::setRGBData(const void* data, int size)
+void MHV::Memory::setRGBData(const void* data)
 {
-    if (_colorSharedMemory->isAttached())
-    {
-        _colorSharedMemory->detach();
-    }
+    _rgbSharedMemory = shmget((key_t)123, _width*_height*3*sizeof(unsigned char), 0666|IPC_CREAT);
+    LOG_IF(ERROR, _rgbSharedMemory == -1) << "Couldn't set RGB shared memory.";
 
-    if(!_colorSharedMemory->create(size))
-    {
-        //std::cout << "DRUtils.cpp - Unable to create shared color memory segment." << std::endl;
-        return;
-    }
+    void* shmData = shmat(_rgbSharedMemory, NULL, 0);
 
-    _colorSharedMemory->lock();
-    void* to = _colorSharedMemory->data();
-    memcpy(to, data, qMin(_colorSharedMemory->size(), size));
-    _colorSharedMemory->unlock();
+    memcpy(shmData, data, _width*_height*3);
+
+    shmdt(shmData);
 }
 
-void MHV::Memory::setDepthData(const void* data, int size)
+void MHV::Memory::setDepthData(const void* data)
 {
-    if (_depthSharedMemory->isAttached())
-    {
-        _depthSharedMemory->detach();
-    }
+    _depthSharedMemory = shmget((key_t)456, _width*_height*2*sizeof(unsigned char), 0666|IPC_CREAT);
+    LOG_IF(ERROR, _depthSharedMemory == -1) << "Couldn't set depth shared memory.";
 
-    if(!_depthSharedMemory->create(size))
-    {
-        //std::cout << "DRUtils.cpp - Unable to create shared depth memory segment." << std::endl;
-        return;
-    }
+    void* shmData = shmat(_depthSharedMemory, NULL, 0);
 
-    _depthSharedMemory->lock();
-    void* to = _depthSharedMemory->data();
-    memcpy(to, data, qMin(_depthSharedMemory->size(), size));
-    _depthSharedMemory->unlock();
+    memcpy(shmData, data, _width*_height*2);
+
+    shmdt(shmData);
 }
 
-void MHV::Memory::setPointCloudData(const float* data, int size)
+void MHV::Memory::setPointCloudData(const float* data)
 {
-    if (_pointCloudSharedMemory->isAttached())
-    {
-        _pointCloudSharedMemory->detach();
-    }
+    _pointCloudSharedMemory = shmget((key_t)789, _width*_height*3*sizeof(float), 0666|IPC_CREAT);
+    LOG_IF(ERROR, _pointCloudSharedMemory == -1) << "Couldn't set point cloud shared memory.";
 
-    if(!_pointCloudSharedMemory->create(size))
-    {
-        //std::cout << "DRUtils.cpp - Unable to create shared point cloud memory segment." << std::endl;
-        return;
-    }
+    float* shmData = (float*)shmat(_pointCloudSharedMemory, NULL, 0);
 
-    _pointCloudSharedMemory->lock();
-    void* to = _pointCloudSharedMemory->data();
-    memcpy(to, data, qMin(_pointCloudSharedMemory->size(), size));
-    _pointCloudSharedMemory->unlock();
+    memcpy(shmData, data, _width*_height*3*sizeof(float));
+
+    shmdt(shmData);
 }
 
 const unsigned char* MHV::Memory::getRGBData()
 {
-    if(!_colorSharedMemory->attach())
-    {
-        //std::cout << "DRUtils.cpp - Failed to attach to RGB shared memory." << std::endl;
-    }
+    _rgbSharedMemory = shmget((key_t)123, 921600, 0666|IPC_CREAT);
+    LOG_IF(ERROR, _rgbSharedMemory == -1) << "Couldn't get RGB shared memory.";
 
-    _colorSharedMemory->lock();
-    memcpy(_rgbData, _colorSharedMemory->data(), _colorSharedMemory->size());
-    _colorSharedMemory->unlock();
+    void* image = shmat(_rgbSharedMemory, NULL, 0);
 
-    _colorSharedMemory->detach();
+    memcpy(_rgbData, image, 921600);
+
+    shmdt(image);
 
     return _rgbData;
 }
 
 const unsigned char* MHV::Memory::getDepthData()
 {
-    if(!_depthSharedMemory->attach())
-    {
-        //std::cout << "DRUtils.cpp - Failed to attach to depth shared memory." << std::endl;
-    }
+    _depthSharedMemory = shmget((key_t)456,  614400, 0666|IPC_CREAT);
+    LOG_IF(ERROR, _depthSharedMemory == -1) << "Couldn't get depth shared memory.";
 
-    _depthSharedMemory->lock();
-    memcpy(_depthData, _depthSharedMemory->data(), _depthSharedMemory->size());
-    _depthSharedMemory->unlock();
+    void* image = shmat(_depthSharedMemory, NULL, 0);
 
-    _depthSharedMemory->detach();
+    memcpy(_depthData, image, 614400);
+
+    shmdt(image);
 
     return _depthData;
 }
 
 const float* MHV::Memory::getPointCloudData()
 {
-    if(!_pointCloudSharedMemory->attach())
-    {
-        //std::cout << "DRUtils.cpp - Failed to attach to depth shared memory." << std::endl;
-    }
+    _pointCloudSharedMemory = shmget((key_t)789, 3686400, 0666|IPC_CREAT);
+    LOG_IF(ERROR, _pointCloudSharedMemory == -1) << "Couldn't get point cloud shared memory.";
 
-    _pointCloudSharedMemory->lock();
-    memcpy(_pointCloudData, _pointCloudSharedMemory->data(), _pointCloudSharedMemory->size());
-    _pointCloudSharedMemory->unlock();
+    void* image = shmat(_pointCloudSharedMemory, NULL, 0);
 
-    _pointCloudSharedMemory->detach();
+    memcpy(_pointCloudData, image, 3686400);
+
+    shmdt(image);
 
     return _pointCloudData;
 }
