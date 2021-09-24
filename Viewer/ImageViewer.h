@@ -4,7 +4,7 @@
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLBuffer>
 #include <QOpenGLVertexArrayObject>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
 
 #include <memory>
 
@@ -18,7 +18,7 @@ namespace MHV
 
 namespace MHV
 {
-    class ImageViewer : public QOpenGLWidget, protected QOpenGLFunctions
+    class ImageViewer : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
     {
         public:
             enum class Type

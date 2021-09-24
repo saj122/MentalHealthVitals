@@ -12,17 +12,18 @@ find_package(Qt6 COMPONENTS Widgets Gui OpenGL OpenGLWidgets REQUIRED)
 include(FetchContent)
 FetchContent_Declare(
   googletest
-  URL https://github.com/google/googletest/archive/e2239ee6043f73722e7aa812a459f54a28552929.zip
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  CMAKE_ARGS -DBUILD_TESTING=OFF
 )
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 FetchContent_Declare(
   glog
-  URL https://github.com/google/glog/archive/8f9ccfe770add9e4c64e9b25c102658e3c763b73.zip
+  GIT_REPOSITORY https://github.com/google/glog.git
+  CMAKE_ARGS -DBUILD_TESTING=OFF
 )
 
-set(glog_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glog)
 
 add_executable(

@@ -6,15 +6,17 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_EXE_LINKER_FLAGS=-fuse-ld=gold)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
+
+find_package(TensorFlow REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(
   glog
-  URL https://github.com/google/glog/archive/8f9ccfe770add9e4c64e9b25c102658e3c763b73.zip
+  GIT_REPOSITORY https://github.com/google/glog.git
+  CMAKE_ARGS -DBUILD_TESTING=OFF
 )
 
-set(glog_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(glog)
 
 add_executable(${PROJECT_NAME}
@@ -23,9 +25,9 @@ add_executable(${PROJECT_NAME}
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/DRUtils)
 target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/external/tf/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${TENSORFLOW_INCLUDE_DIR})
 
 target_link_libraries(${PROJECT_NAME} DRUtils)
 target_link_libraries(${PROJECT_NAME} glog::glog)
 target_link_libraries(${PROJECT_NAME} ${OpenCV_LIBS})
-target_link_libraries(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/external/tf/lib/libtensorflow.so)
+target_link_libraries(${PROJECT_NAME} ${TENSORFLOW_LIBRARIES})
