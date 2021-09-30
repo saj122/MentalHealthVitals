@@ -24,7 +24,7 @@ namespace MHV
             void run();
             bool isValid();
         private:
-            const std::vector<float> calculatePointCloud(const uint16_t* depth);
+            std::vector<float> calculatePointCloud(const uint16_t* depth);
         private:
             std::unique_ptr<Memory> _utils;
 
@@ -37,8 +37,8 @@ namespace MHV
             openni::VideoMode _depthVideoMode;
             openni::VideoMode _colorVideoMode;
 
-            int _width;
-            int _height;
+            uint32_t _width;
+            uint32_t _height;
     };
 }
 

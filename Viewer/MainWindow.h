@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include <memory>
+
 namespace Ui { class MainWindow; }
 
 namespace MHV
@@ -18,8 +20,8 @@ namespace MHV
         Q_OBJECT
 
         public:
-            MainWindow(QWidget *parent = nullptr);
-            ~MainWindow();
+            explicit MainWindow(QWidget *parent = nullptr);
+            ~MainWindow() override;
 
         private slots:
             void on_actionExit_triggered();
@@ -29,9 +31,9 @@ namespace MHV
         private:
             Ui::MainWindow *ui;
 
-            ImageViewer* _rgbViewer;
-            ImageViewer* _depthViewer;
-            PointCloudViewer* _pointCloudViewer;
+            std::unique_ptr<ImageViewer> _rgbViewer;
+            std::unique_ptr<ImageViewer> _depthViewer;
+            std::unique_ptr<PointCloudViewer> _pointCloudViewer;
     };
 }
 

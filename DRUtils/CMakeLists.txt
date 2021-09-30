@@ -6,18 +6,36 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include(FetchContent)
-FetchContent_Declare(
-  glog
-  GIT_REPOSITORY https://github.com/google/glog.git
-  CMAKE_ARGS -DBUILD_TESTING=OFF
-)
+find_package(glog REQUIRED)
 
-FetchContent_MakeAvailable(glog)
+if(WIN32)
+    add_library(${PROJECT_NAME} STATIC
+            Memory.h
+            MemoryWindows.cpp
+            MemoryWindows.h
+            MemoryFactory.h
+    )
+elseif(UNIX)
+    add_library(${PROJECT_NAME} STATIC
+            MemoryLinux.cpp
+            MemoryLinux.h
+            Memory.h
+            MemoryFactory.h)
+endif()
 
-add_library(${PROJECT_NAME} STATIC
-  Memory.cpp
-  Memory.h
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE glog::glog)
 
-target_link_libraries(${PROJECT_NAME} glog::glog)
+enable_testing()
+
+include(GoogleTest)
+
+find_package(GTest REQUIRED)
+
+add_executable(DRUtilsTest MemoryTest.cpp)
+
+target_link_libraries(DRUtilsTest
+                      GTest::Main
+                      DRUtils)
+
+gtest_discover_tests(DRUtilsTest)
+

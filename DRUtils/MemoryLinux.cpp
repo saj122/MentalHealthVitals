@@ -1,4 +1,4 @@
-#include "Memory.h"
+#include "MemoryLinux.h"
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -7,18 +7,15 @@
 
 #include <glog/logging.h>
 
-
-
-MHV::Memory::Memory(int width, int height) : _width(width),
+MHV::MemoryLinux::MemoryLinux(int width, int height) : _width(width),
                                              _height(height),
                                              _rgbData(new unsigned char[width*height*3]),
                                              _depthData(new unsigned char[width*height*2]),
                                              _pointCloudData(new float[width*height*3])
 {
-
 }
 
-MHV::Memory::~Memory()
+MHV::MemoryLinux::~MemoryLinux()
 {
     delete[] _rgbData;
     delete[] _depthData;
@@ -29,7 +26,7 @@ MHV::Memory::~Memory()
     shmctl(_pointCloudSharedMemory,IPC_RMID,NULL);
 }
 
-void MHV::Memory::setRGBData(const void* data)
+void MHV::MemoryLinux::setRGBData(const void* data)
 {
     _rgbSharedMemory = shmget((key_t)123, _width*_height*3*sizeof(unsigned char), 0666|IPC_CREAT);
     LOG_IF(ERROR, _rgbSharedMemory == -1) << "Couldn't set RGB shared memory.";
@@ -41,7 +38,7 @@ void MHV::Memory::setRGBData(const void* data)
     shmdt(shmData);
 }
 
-void MHV::Memory::setDepthData(const void* data)
+void MHV::MemoryLinux::setDepthData(const void* data)
 {
     _depthSharedMemory = shmget((key_t)456, _width*_height*2*sizeof(unsigned char), 0666|IPC_CREAT);
     LOG_IF(ERROR, _depthSharedMemory == -1) << "Couldn't set depth shared memory.";
@@ -53,7 +50,7 @@ void MHV::Memory::setDepthData(const void* data)
     shmdt(shmData);
 }
 
-void MHV::Memory::setPointCloudData(const float* data)
+void MHV::MemoryLinux::setPointCloudData(const float* data)
 {
     _pointCloudSharedMemory = shmget((key_t)789, _width*_height*3*sizeof(float), 0666|IPC_CREAT);
     LOG_IF(ERROR, _pointCloudSharedMemory == -1) << "Couldn't set point cloud shared memory.";
@@ -65,9 +62,9 @@ void MHV::Memory::setPointCloudData(const float* data)
     shmdt(shmData);
 }
 
-const unsigned char* MHV::Memory::getRGBData()
+const unsigned char* MHV::MemoryLinux::getRGBData()
 {
-    _rgbSharedMemory = shmget((key_t)123, 921600, 0666|IPC_CREAT);
+    _rgbSharedMemory = shmget((key_t)123, _width*_height*3, 0666|IPC_CREAT);
     LOG_IF(ERROR, _rgbSharedMemory == -1) << "Couldn't get RGB shared memory.";
 
     void* image = shmat(_rgbSharedMemory, NULL, 0);
@@ -79,9 +76,9 @@ const unsigned char* MHV::Memory::getRGBData()
     return _rgbData;
 }
 
-const unsigned char* MHV::Memory::getDepthData()
+const unsigned char* MHV::MemoryLinux::getDepthData()
 {
-    _depthSharedMemory = shmget((key_t)456,  614400, 0666|IPC_CREAT);
+    _depthSharedMemory = shmget((key_t)456,  _width*_height*2, 0666|IPC_CREAT);
     LOG_IF(ERROR, _depthSharedMemory == -1) << "Couldn't get depth shared memory.";
 
     void* image = shmat(_depthSharedMemory, NULL, 0);
@@ -93,9 +90,9 @@ const unsigned char* MHV::Memory::getDepthData()
     return _depthData;
 }
 
-const float* MHV::Memory::getPointCloudData()
+const float* MHV::MemoryLinux::getPointCloudData()
 {
-    _pointCloudSharedMemory = shmget((key_t)789, 3686400, 0666|IPC_CREAT);
+    _pointCloudSharedMemory = shmget((key_t)789, _width*_height*3*4, 0666|IPC_CREAT);
     LOG_IF(ERROR, _pointCloudSharedMemory == -1) << "Couldn't get point cloud shared memory.";
 
     void* image = shmat(_pointCloudSharedMemory, NULL, 0);

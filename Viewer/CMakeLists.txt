@@ -23,7 +23,8 @@ set(PROJECT_SOURCES
         ImageViewer.h
         PointCloudViewer.h
         PointCloudViewer.cpp
-)
+        Geometry.h
+        ObjectBuilder.h DrawCommand.h)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 

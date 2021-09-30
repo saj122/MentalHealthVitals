@@ -1,16 +1,19 @@
 #include "OpenNICamera.h"
 
-#include <Memory.h>
+#include "MemoryFactory.h"
 
 #include <glog/logging.h>
+
+#include <math.h>
 
 #define WIDTH 640
 #define HEIGHT 480
 
-MHV::OpenNICamera::OpenNICamera() : _utils(new Memory(WIDTH,HEIGHT)),
+MHV::OpenNICamera::OpenNICamera() : _width(WIDTH),
+                                    _height(HEIGHT),
                                     _streams(new openni::VideoStream*[2]())
 {
-
+    _utils = MemoryFactory::create();
 }
 
 MHV::OpenNICamera::~OpenNICamera()
@@ -123,7 +126,7 @@ void MHV::OpenNICamera::init()
     _streams.get()[1] = &_color;
 }
 
-const std::vector<float> MHV::OpenNICamera::calculatePointCloud(const uint16_t* depth)
+std::vector<float> MHV::OpenNICamera::calculatePointCloud(const uint16_t* depth)
 {
     std::vector<float> points;
     points.reserve(_width*_height*3);
@@ -172,7 +175,7 @@ void MHV::OpenNICamera::run()
         {
             _utils->setDepthData(_depthFrame.getData());
 
-            const uint16_t* depth = static_cast<const uint16_t*>( _depthFrame.getData() );
+            auto* depth = static_cast<const uint16_t*>( _depthFrame.getData() );
             std::vector<float> points = calculatePointCloud(depth);
             _utils->setPointCloudData(points.data());
         }

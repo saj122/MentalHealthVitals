@@ -1,24 +1,29 @@
 #include "PointCloudViewer.h"
 
-#include "Memory.h"
+#include "MemoryFactory.h"
 
 #include <QOpenGLShader>
-#include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QMouseEvent>
 #include <QVector>
 
-#include <utility>
-#include <iostream>
-
 #define WIDTH 640
 #define HEIGHT 480
 
-MHV::PointCloudViewer::PointCloudViewer() : _utils(new Memory(WIDTH, HEIGHT))
+MHV::PointCloudViewer::PointCloudViewer() : _mousePos(0.0,0.0)
 {
-    startTimer(30);
+    _utils = MemoryFactory::create();
 
-    _viewMat.lookAt(QVector3D(0.0,0.0,0.0), QVector3D(0.0,0.0,10.0),QVector3D(0.0,1.0,0.0));
+    startTimer(33);
+    _modelMat.setToIdentity();
+
+    _viewMat.lookAt(QVector3D(0.0,0.0,10000.0), QVector3D(0.0,0.0,12000.0), QVector3D(0.0,1.0,0.0));
+
+    const float zNear = 0.01f, zFar = 100000.0f, fov = 15.0f;
+
+    _projectionMat.setToIdentity();
+
+    _projectionMat.perspective(fov, WIDTH/HEIGHT, zNear, zFar);
 }
 
 MHV::PointCloudViewer::~PointCloudViewer()
@@ -28,40 +33,74 @@ MHV::PointCloudViewer::~PointCloudViewer()
     doneCurrent();
 }
 
+void MHV::PointCloudViewer::timerEvent(QTimerEvent* e)
+{
+    update();
+}
+
+void MHV::PointCloudViewer::mousePressEvent(QMouseEvent *e)
+{
+    _mousePos = e->position();
+}
+
+void MHV::PointCloudViewer::wheelEvent(QWheelEvent *e)
+{
+
+}
+
 void MHV::PointCloudViewer::mouseMoveEvent(QMouseEvent *e)
 {
     if(e->buttons() == Qt::MiddleButton)
     {
+        double diffX = (e->position().x() - _mousePos.x())/50.0;
+        double diffY = -(e->position().y() - _mousePos.y())/50.0;
 
+        QVector3D camRight = QVector3D(_viewMat.row(0)[0],_viewMat.row(1)[0], _viewMat.row(2)[0]);
+        QVector3D camForward = QVector3D(_viewMat.row(0)[2],_viewMat.row(1)[2], _viewMat.row(2)[2]);
+        QVector3D camPos = QVector3D(_viewMat.row(0)[3],_viewMat.row(1)[3], _viewMat.row(2)[3]);
+        QVector3D focus = QVector3D(0.0,0.0,12000.0);
+        QVector3D trans = camPos - focus;
+        float h = trans.length();
+
+        _viewMat.translate(h*camForward);
+
+        QMatrix4x4 rotX, rotY;
+        rotX.rotate(diffY, camRight);
+        rotY.rotate(diffX, QVector3D(0.0,1.0,0.0));
+
+        _viewMat = rotY*rotX*_viewMat;
+
+        camForward = QVector3D(_viewMat.row(0)[2],_viewMat.row(1)[2], _viewMat.row(2)[2]);
+
+        _viewMat.translate(-h*camForward);
     }
-}
-
-void MHV::PointCloudViewer::timerEvent(QTimerEvent* event)
-{
-    update();
+    _mousePos = e->position();
 }
 
 void MHV::PointCloudViewer::initializeGL()
 {
     initializeOpenGLFunctions();
 
+    makePointCloud();
+
     glEnable(GL_DEPTH_TEST);
 
     glEnable(GL_PROGRAM_POINT_SIZE);
 
-    QOpenGLShader* vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
+    auto vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
     const char *vsrc =
         "#version 330 core\n"
         "layout (location = 0) in vec3 aPos;\n"
-        "uniform mat4 vp;\n"
+        "uniform mat4 mv;\n"
+        "uniform mat4 p;\n"
         "void main()\n"
         "{\n"
-        "    gl_Position = vp*vec4(aPos, 1.0);\n"
+        "    gl_Position = p*mv*vec4(aPos, 1.0);\n"
         "    gl_PointSize = 1.0;\n"
         "}\n";
     vshader->compileSourceCode(vsrc);
 
-    QOpenGLShader* fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
+    auto fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
     const char *fsrc =
         "#version 330 core\n"
         "out vec4 FragColor;\n"
@@ -81,35 +120,42 @@ void MHV::PointCloudViewer::initializeGL()
 
 void MHV::PointCloudViewer::paintGL()
 {
-    makePointCloud();
     QColor clearColor = Qt::black;
     glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   _program->enableAttributeArray(0);
-   _program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
+    makePointCloud();
 
-   _program->setUniformValue("vp", _projectionMat * _viewMat);
+    _program->enableAttributeArray(0);
+    _program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
 
-   glDrawArrays(GL_POINTS, 0, WIDTH*HEIGHT);
+    _program->setUniformValue("mv", _viewMat * _modelMat);
+    _program->setUniformValue("p", _projectionMat);
+
+    glDrawArrays(GL_POINTS, 0, WIDTH*HEIGHT);
 }
 
 void MHV::PointCloudViewer::resizeGL(int w, int h)
 {
-    qreal aspect = qreal(w) / qreal(h ? h : 1);
+    auto aspect = (float)(w / h ? h : 1);
 
-    const qreal zNear = 0.001, zFar = 50000.0, fov = 10.0;
+    const float zNear = 0.01f, zFar = 100000.0f, fov = 15.0f;
 
     _projectionMat.setToIdentity();
 
     _projectionMat.perspective(fov, aspect, zNear, zFar);
 }
 
-void MHV::PointCloudViewer::makePointCloud()
+bool MHV::PointCloudViewer::makePointCloud()
 {
     const float* points = _utils->getPointCloudData();
+    if (points)
+    {
+        _vbo.create();
+        _vbo.bind();
+        _vbo.allocate(points, WIDTH * HEIGHT * 3 * sizeof(float));
+        return true;
+    }
 
-    _vbo.create();
-    _vbo.bind();
-    _vbo.allocate(points, WIDTH*HEIGHT*3*sizeof(float));
+    return false;
 }

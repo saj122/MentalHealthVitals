@@ -17,6 +17,7 @@ MHV::Controller::Controller() : _openNICamera(nullptr)
 {
     __stop = false;
     std::signal(SIGINT,  sigHandler);
+    std::signal(SIGTERM, sigHandler);
 }
 
 MHV::Controller::~Controller()

@@ -37,3 +37,10 @@ build_debug
 build_minsizerel
 build_release
 build_relwithdebug
+.idea
+external/libtensorflow
+external/gflags
+external/glog
+external/qt6
+external/gtest
+external/opencv

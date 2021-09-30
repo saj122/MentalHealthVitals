@@ -24,15 +24,17 @@ namespace MHV
 
         public:
             PointCloudViewer();
-            ~PointCloudViewer();
+            ~PointCloudViewer() override;
         protected:
             void initializeGL() override;
             void resizeGL(int w, int h) override;
             void paintGL() override;
             void mouseMoveEvent(QMouseEvent *e) override;
+            void mousePressEvent(QMouseEvent *e) override;
+            void wheelEvent(QWheelEvent *e) override;
             void timerEvent(QTimerEvent* e) override;
         private:
-            void makePointCloud();
+            bool makePointCloud();
         private:
             QOpenGLBuffer _vbo;
             std::unique_ptr<QOpenGLShaderProgram> _program;
@@ -41,6 +43,9 @@ namespace MHV
 
             QMatrix4x4 _projectionMat;
             QMatrix4x4 _viewMat;
+            QMatrix4x4 _modelMat;
+
+            QPointF _mousePos;
     };
 }
 

@@ -1,17 +1,17 @@
 #include "ImageViewer.h"
 
-#include "Memory.h"
-
 #include <QOpenGLShader>
-#include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
+
+#include "MemoryFactory.h"
 
 #define WIDTH 640
 #define HEIGHT 480
 
-MHV::ImageViewer::ImageViewer(Type type) : _utils(new Memory(WIDTH, HEIGHT)), _viewerType(type)
+MHV::ImageViewer::ImageViewer(Type type) : _viewerType(type)
 {
-    startTimer(30);
+    _utils = MemoryFactory::create();
+    startTimer(33);
 }
 
 MHV::ImageViewer::~ImageViewer()
@@ -82,16 +82,23 @@ void MHV::ImageViewer::paintGL()
 
    if(_texture)
    {
-       _texture->release();
        if(_viewerType == Type::RGB)
        {
-           _texture->setData(QOpenGLTexture::PixelFormat::RGB, QOpenGLTexture::PixelType::UInt8, _utils->getRGBData());
+           const unsigned char* image = _utils->getRGBData();
+           if(image)
+               _texture->setData(QOpenGLTexture::PixelFormat::RGB, QOpenGLTexture::PixelType::UInt8, image);
        }
        else if(_viewerType == Type::DEPTH)
        {
-           _texture->setData(QOpenGLTexture::PixelFormat::Luminance, QOpenGLTexture::PixelType::UInt16, _utils->getDepthData());
+           const unsigned char* image = _utils->getDepthData();
+           if (image)
+               _texture->setData(QOpenGLTexture::PixelFormat::Luminance, QOpenGLTexture::PixelType::UInt16, image);
        }
        _texture->bind();
+   }
+   else
+   {
+       makeImageTexture();
    }
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -106,11 +113,15 @@ void MHV::ImageViewer::makeImageTexture()
 {
     if(_viewerType == Type::RGB)
     {
-        _texture = std::make_unique<QOpenGLTexture>(QImage(_utils->getRGBData(), 640, 480, QImage::Format::Format_RGB888).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
+        const unsigned char* image = _utils->getRGBData();
+        if (image)
+            _texture = std::make_unique<QOpenGLTexture>(QImage(image, 640, 480, QImage::Format::Format_RGB888).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
     }
     else if(_viewerType == Type::DEPTH)
     {
-        _texture = std::make_unique<QOpenGLTexture>(QImage(_utils->getDepthData(), 640, 480, QImage::Format::Format_Grayscale16).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
+        const unsigned char* image = _utils->getDepthData();
+        if (image)
+            _texture = std::make_unique<QOpenGLTexture>(QImage(image, 640, 480, QImage::Format::Format_Grayscale16).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
     }
 
     QVector<GLfloat> vertData;
