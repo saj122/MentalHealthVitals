@@ -20,7 +20,8 @@ elseif(UNIX)
             MemoryLinux.cpp
             MemoryLinux.h
             Memory.h
-            MemoryFactory.h)
+            MemoryFactory.h
+    )
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glog::glog)

@@ -44,3 +44,4 @@ external/glog
 external/qt6
 external/gtest
 external/opencv
+cmake-build-debug
