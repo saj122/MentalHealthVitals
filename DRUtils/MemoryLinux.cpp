@@ -8,10 +8,10 @@
 #include <glog/logging.h>
 
 MHV::MemoryLinux::MemoryLinux(int width, int height) : _width(width),
-                                             _height(height),
-                                             _rgbData(new unsigned char[width*height*3]),
-                                             _depthData(new unsigned char[width*height*2]),
-                                             _pointCloudData(new float[width*height*3])
+                                                       _height(height),
+                                                       _rgbData(new unsigned char[width*height*3]),
+                                                       _depthData(new unsigned char[width*height*2]),
+                                                       _pointCloudData(new float[width*height*3])
 {
 }
 
@@ -33,7 +33,7 @@ void MHV::MemoryLinux::setRGBData(const void* data)
 
     void* shmData = shmat(_rgbSharedMemory, NULL, 0);
 
-    memcpy(shmData, data, _width*_height*3);
+    std::memcpy(shmData, data, _width*_height*3);
 
     shmdt(shmData);
 }
@@ -45,7 +45,7 @@ void MHV::MemoryLinux::setDepthData(const void* data)
 
     void* shmData = shmat(_depthSharedMemory, NULL, 0);
 
-    memcpy(shmData, data, _width*_height*2);
+    std::memcpy(shmData, data, _width*_height*2);
 
     shmdt(shmData);
 }
@@ -57,7 +57,7 @@ void MHV::MemoryLinux::setPointCloudData(const float* data)
 
     float* shmData = (float*)shmat(_pointCloudSharedMemory, NULL, 0);
 
-    memcpy(shmData, data, _width*_height*3*sizeof(float));
+    std::memcpy(shmData, data, _width*_height*3*sizeof(float));
 
     shmdt(shmData);
 }
@@ -69,7 +69,7 @@ const unsigned char* MHV::MemoryLinux::getRGBData()
 
     void* image = shmat(_rgbSharedMemory, NULL, 0);
 
-    memcpy(_rgbData, image, 921600);
+    std::memcpy(_rgbData, image, _width*_height*3);
 
     shmdt(image);
 
@@ -83,7 +83,7 @@ const unsigned char* MHV::MemoryLinux::getDepthData()
 
     void* image = shmat(_depthSharedMemory, NULL, 0);
 
-    memcpy(_depthData, image, 614400);
+    std::memcpy(_depthData, image, _width*_height*2);
 
     shmdt(image);
 
@@ -92,12 +92,12 @@ const unsigned char* MHV::MemoryLinux::getDepthData()
 
 const float* MHV::MemoryLinux::getPointCloudData()
 {
-    _pointCloudSharedMemory = shmget((key_t)789, _width*_height*3*4, 0666|IPC_CREAT);
+    _pointCloudSharedMemory = shmget((key_t)789, _width*_height*12, 0666|IPC_CREAT);
     LOG_IF(ERROR, _pointCloudSharedMemory == -1) << "Couldn't get point cloud shared memory.";
 
     void* image = shmat(_pointCloudSharedMemory, NULL, 0);
 
-    memcpy(_pointCloudData, image, 3686400);
+    std::memcpy(_pointCloudData, image, _width*_height*12);
 
     shmdt(image);
 
