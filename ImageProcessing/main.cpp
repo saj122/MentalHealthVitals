@@ -12,11 +12,12 @@ int main(int argc, char *argv[]) {
     FLAGS_logtostderr = 1;
     FLAGS_minloglevel = 0;
 #endif
-
-    TF_Session *sess;
-    TF_Graph *graph;
-
+    TF_Graph* graph = TF_NewGraph();
     TF_Status* status = TF_NewStatus();
+
+    TF_SessionOptions* sess_opts = TF_NewSessionOptions();
+    TF_Session* sess = TF_NewSession(graph, sess_opts, status);
+
     TF_SessionOptions* options = TF_NewSessionOptions();
     uint8_t config[11] = {0x32, 0x09, 0x09, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0xe3, 0x3f};
     TF_SetConfig(options, (void*)config, 11, status);
