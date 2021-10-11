@@ -1,9 +1,10 @@
 #define GOOGLE_STRIP_LOG 1
 #include <glog/logging.h>
 
-#include <tensorflow/c/c_api.h>
-
 #include <opencv2/opencv.hpp>
+//#include <opencv2/objdetect.hpp>
+
+#include "MemoryFactory.h"
 
 int main(int argc, char *argv[]) {
     google::InitGoogleLogging(argv[0]);
@@ -12,24 +13,39 @@ int main(int argc, char *argv[]) {
     FLAGS_logtostderr = 1;
     FLAGS_minloglevel = 0;
 #endif
-    TF_Graph* graph = TF_NewGraph();
-    TF_Status* status = TF_NewStatus();
+    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create(640*480*3, 640*480*2, 640*480*3*sizeof(float));
 
-    TF_SessionOptions* sess_opts = TF_NewSessionOptions();
-    TF_Session* sess = TF_NewSession(graph, sess_opts, status);
+    cv::CascadeClassifier clfr("../../ImageProcessing/models/haarcascade_frontalface_default.xml");
 
-    TF_SessionOptions* options = TF_NewSessionOptions();
-    uint8_t config[11] = {0x32, 0x09, 0x09, 0x33, 0x33, 0x33, 0x33, 0x33, 0x33, 0xe3, 0x3f};
-    TF_SetConfig(options, (void*)config, 11, status);
+    std::vector<cv::Rect> features;
 
-    TF_Status* s = TF_NewStatus();
+    while(1)
+    {
+        const unsigned char *data = mem->getRGBData();
+        cv::Mat image = cv::Mat(480, 640, CV_8UC3, (void *) data);
+        cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
 
-    TF_CloseSession(sess,s);
-    TF_DeleteSession(sess,s);
-    TF_DeleteGraph(graph);
-    TF_DeleteStatus(s);
+        cv::Mat grayscale_image;
+        cv::cvtColor(image, grayscale_image, cv::COLOR_RGB2GRAY);
+        cv::equalizeHist(grayscale_image, grayscale_image);
 
-    cv::destroyAllWindows();
+        clfr.detectMultiScale(grayscale_image, features, 1.05, 12, 0 | cv::CASCADE_SCALE_IMAGE, cv::Size(30, 30));
+
+        for (auto &feature: features)
+            cv::rectangle(image, feature, cv::Scalar(0, 255, 0), 2);
+
+        cv::imshow("Image", image);
+        LOG(INFO) << features.size();
+
+        switch (cv::waitKey(10)) {
+            case 'q':
+                std::exit(EXIT_SUCCESS);
+            case 'Q':
+                std::exit(EXIT_SUCCESS);
+            default:
+                break;
+        }
+    }
     return 0;
 }
 

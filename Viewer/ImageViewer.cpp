@@ -10,7 +10,7 @@
 
 MHV::ImageViewer::ImageViewer(Type type) : _viewerType(type)
 {
-    _utils = MemoryFactory::create();
+    _utils = MemoryFactory::create(WIDTH*HEIGHT*3,WIDTH*HEIGHT*2,WIDTH*HEIGHT*3*sizeof(float));
     startTimer(33);
 }
 

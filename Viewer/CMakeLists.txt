@@ -11,8 +11,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 COMPONENTS Widgets Gui OpenGL OpenGLWidgets REQUIRED)
-find_package(Qt6 COMPONENTS Widgets Gui OpenGL OpenGLWidgets REQUIRED)
+find_package(QT NAMES Qt6 COMPONENTS Core Widgets Gui OpenGL OpenGLWidgets REQUIRED)
+find_package(Qt6 COMPONENTS Core Widgets Gui OpenGL OpenGLWidgets REQUIRED)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -24,14 +24,15 @@ set(PROJECT_SOURCES
         PointCloudViewer.h
         PointCloudViewer.cpp
         Geometry.h
-        ObjectBuilder.h DrawCommand.h)
+        ObjectBuilder.h
+        DrawCommand.h)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/DRUtils)
 
-target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
 target_link_libraries(${PROJECT_NAME} Qt6::Core)
+target_link_libraries(${PROJECT_NAME} Qt6::Widgets)
 target_link_libraries(${PROJECT_NAME} Qt6::Gui)
 target_link_libraries(${PROJECT_NAME} Qt6::OpenGL)
 target_link_libraries(${PROJECT_NAME} Qt6::OpenGLWidgets)

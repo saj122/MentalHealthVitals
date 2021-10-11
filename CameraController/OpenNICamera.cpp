@@ -13,7 +13,7 @@ MHV::OpenNICamera::OpenNICamera() : _width(WIDTH),
                                     _height(HEIGHT),
                                     _streams(new openni::VideoStream*[2]())
 {
-    _utils = MemoryFactory::create();
+    _utils = MemoryFactory::create(WIDTH*HEIGHT*3,WIDTH*HEIGHT*2,WIDTH*HEIGHT*3*sizeof(float));
 }
 
 MHV::OpenNICamera::~OpenNICamera()

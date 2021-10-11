@@ -12,12 +12,12 @@
 
 MHV::PointCloudViewer::PointCloudViewer() : _mousePos(0.0,0.0)
 {
-    _utils = MemoryFactory::create();
+    _utils = MemoryFactory::create(WIDTH*HEIGHT*3,WIDTH*HEIGHT*2,WIDTH*HEIGHT*3*sizeof(float));
 
     startTimer(33);
     _modelMat.setToIdentity();
 
-    _viewMat.lookAt(QVector3D(0.0,0.0,10000.0), QVector3D(0.0,0.0,12000.0), QVector3D(0.0,1.0,0.0));
+    _viewMat.lookAt(QVector3D(0.0,0.0,10000.0), QVector3D(0.0,0.0,20000.0), QVector3D(0.0,1.0,0.0));
 
     const float zNear = 0.01f, zFar = 100000.0f, fov = 15.0f;
 
@@ -58,21 +58,15 @@ void MHV::PointCloudViewer::mouseMoveEvent(QMouseEvent *e)
         QVector3D camRight = QVector3D(_viewMat.row(0)[0],_viewMat.row(1)[0], _viewMat.row(2)[0]);
         QVector3D camForward = QVector3D(_viewMat.row(0)[2],_viewMat.row(1)[2], _viewMat.row(2)[2]);
         QVector3D camPos = QVector3D(_viewMat.row(0)[3],_viewMat.row(1)[3], _viewMat.row(2)[3]);
-        QVector3D focus = QVector3D(0.0,0.0,12000.0);
-        QVector3D trans = camPos - focus;
-        float h = trans.length();
+        QVector3D focus = QVector3D(0.0,0.0,15000.0);
 
-        _viewMat.translate(h*camForward);
+        float x = 15000.0*cos(diffY)*sin(diffX);
+        float y = 15000.0*sin(diffY)*sin(diffX);
+        float z = 15000.0*cos(diffX);
 
-        QMatrix4x4 rotX, rotY;
-        rotX.rotate(diffY, camRight);
-        rotY.rotate(diffX, QVector3D(0.0,1.0,0.0));
+        QVector3D newPos = camPos + QVector3D(x,y,z);
 
-        _viewMat = rotY*rotX*_viewMat;
-
-        camForward = QVector3D(_viewMat.row(0)[2],_viewMat.row(1)[2], _viewMat.row(2)[2]);
-
-        _viewMat.translate(-h*camForward);
+        _viewMat.lookAt(newPos, focus, QVector3D(0.0,1.0,0.0));
     }
     _mousePos = e->position();
 }
