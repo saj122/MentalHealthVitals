@@ -9,14 +9,14 @@ namespace MHV
 {
     class Memory
     {
-    public:
-        virtual ~Memory() = default;
-        virtual void setRGBData(const void* data) = 0;
-        virtual void setDepthData(const void* data) = 0;
-        virtual void setPointCloudData(const float* data) = 0;
-        virtual const unsigned char* getRGBData() = 0;
-        virtual const unsigned char* getDepthData() = 0;
-        virtual const float* getPointCloudData() = 0;
+        public:
+            virtual ~Memory() = default;
+            virtual void setRGBData(const void* data) = 0;
+            virtual void setDepthData(const void* data) = 0;
+            virtual void setPointCloudData(const float* data) = 0;
+            virtual const unsigned char* getRGBData() = 0;
+            virtual const unsigned char* getDepthData() = 0;
+            virtual const float* getPointCloudData() = 0;
     };
 }
 

@@ -9,14 +9,15 @@
 
 #include "MemoryWindows.h"
 
-MHV::MemoryWindows::MemoryWindows(size_t width, size_t height) :  _rgbData(new unsigned char[width * height * 3]),
-                                                            _depthData(new unsigned char[width * height * 2]),
-                                                            _pointCloudData(new float[width * height * 3]),
-                                                            _rgbSharedMemory("123"),
-                                                            _depthSharedMemory("456"),
-                                                            _pointCloudSharedMemory("789"),
-                                                            _width(width),
-                                                            _height(height)                       
+MHV::MemoryWindows::MemoryWindows(size_t rgb_size, size_t depth_size, size_t point_cloud_size) :  _rgbData(new unsigned char[rgb_size]),
+                                                                                                  _depthData(new unsigned char[depth_size]),
+                                                                                                  _pointCloudData(new float[point_cloud_size]),
+                                                                                                  _rgbSharedMemory("123"),
+                                                                                                  _depthSharedMemory("456"),
+                                                                                                  _pointCloudSharedMemory("789"),
+                                                                                                  _rgb_size(rgb_size),
+                                                                                                  _depth_size(depth_size),
+                                                                                                  _point_cloud_size(point_cloud_size)
 {
 }
 
@@ -31,7 +32,6 @@ void MHV::MemoryWindows::setRGBData(const void* data)
 {
     HANDLE hMapFile;
     unsigned char* pBuf;
-    const size_t BUF_SIZE = _width * _height * 3;
 
     hMapFile = CreateFileMapping(
         INVALID_HANDLE_VALUE,    
@@ -50,7 +50,7 @@ void MHV::MemoryWindows::setRGBData(const void* data)
         FILE_MAP_ALL_ACCESS, 
         0,
         0,
-        BUF_SIZE);
+        _rgb_size);
 
     if (pBuf == NULL)
     {
@@ -73,7 +73,6 @@ void MHV::MemoryWindows::setDepthData(const void* data)
 {
     HANDLE hMapFile;
     unsigned char* pBuf;
-    const size_t BUF_SIZE = _width * _height * 2;
 
     hMapFile = CreateFileMapping(
         INVALID_HANDLE_VALUE,
@@ -92,7 +91,7 @@ void MHV::MemoryWindows::setDepthData(const void* data)
         FILE_MAP_ALL_ACCESS,
         0,
         0,
-        BUF_SIZE);
+        _depth_size);
 
     if (pBuf == NULL)
     {
@@ -115,7 +114,6 @@ void MHV::MemoryWindows::setPointCloudData(const float* data)
 {
     HANDLE hMapFile;
     float* pBuf;
-    const size_t BUF_SIZE = _width * _height * 3 * 4;
 
     hMapFile = CreateFileMapping(
         INVALID_HANDLE_VALUE,
@@ -134,7 +132,7 @@ void MHV::MemoryWindows::setPointCloudData(const float* data)
         FILE_MAP_ALL_ACCESS,
         0,
         0,
-        BUF_SIZE);
+        _point_cloud_size);
 
     if (pBuf == NULL)
     {
@@ -157,7 +155,6 @@ const unsigned char* MHV::MemoryWindows::getRGBData()
 {
     HANDLE hMapFile;
     unsigned char* pBuf;
-    const size_t BUF_SIZE = _width * _height * 3;
 
     hMapFile = OpenFileMapping(
         FILE_MAP_ALL_ACCESS,   
@@ -174,7 +171,7 @@ const unsigned char* MHV::MemoryWindows::getRGBData()
         FILE_MAP_ALL_ACCESS,  
         0,
         0,
-        BUF_SIZE);
+        _rgb_size);
 
     if (pBuf == NULL)
     {
@@ -198,7 +195,6 @@ const unsigned char* MHV::MemoryWindows::getDepthData()
 {
     HANDLE hMapFile;
     unsigned char* pBuf;
-    const size_t BUF_SIZE = _width * _height * 2;
 
     hMapFile = OpenFileMapping(
         FILE_MAP_ALL_ACCESS,
@@ -215,7 +211,7 @@ const unsigned char* MHV::MemoryWindows::getDepthData()
         FILE_MAP_ALL_ACCESS,
         0,
         0,
-        BUF_SIZE);
+        _depth_size);
 
     if (pBuf == NULL)
     {
@@ -239,7 +235,6 @@ const float* MHV::MemoryWindows::getPointCloudData()
 {
     HANDLE hMapFile;
     float* pBuf;
-    const size_t BUF_SIZE = _width * _height * 3 * 4;
 
     hMapFile = OpenFileMapping(
         FILE_MAP_ALL_ACCESS,
@@ -256,7 +251,7 @@ const float* MHV::MemoryWindows::getPointCloudData()
         FILE_MAP_ALL_ACCESS,
         0,
         0,
-        BUF_SIZE);
+        _point_cloud_size);
 
     if (pBuf == NULL)
     {

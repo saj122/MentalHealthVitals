@@ -8,38 +8,41 @@
 #include <memory>
 #include <string>
 
-TEST(MemoryTest, TestRGBData)
+class MemoryTest : public ::testing::Test
 {
-    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create();
-    std::string str("Hello World");
-    mem->setRGBData(str.data());
-    std::string rStr;
-    rStr.append((char*)mem->getRGBData());
-    EXPECT_STREQ(str.data(),rStr.data());
+    protected:
+        void SetUp() override
+        {
+            _mem = MHV::MemoryFactory::create(12,12,4*sizeof(float));
+        }
+
+        std::unique_ptr<MHV::Memory> _mem;
+};
+
+TEST_F(MemoryTest, TestRGBData)
+{
+    _mem->setRGBData("Hello World");
+    EXPECT_STREQ("Hello World", (char*) _mem->getRGBData());
 }
 
-TEST(MemoryTest, TestDepthData)
+TEST_F(MemoryTest, TestDepthData)
 {
-    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create();
     std::string str("Hello World");
-    mem->setDepthData(str.data());
-    std::string rStr;
-    rStr.append((char*)mem->getDepthData());
-    EXPECT_STREQ(str.data(),rStr.data());
+    _mem->setDepthData(str.data());
+    EXPECT_STREQ(str.data(),(char*)_mem->getDepthData());
 }
 
-TEST(MemoryTest, TestPointCloudData)
+TEST_F(MemoryTest, TestPointCloudData)
 {
-    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create();
     float* points = new float[4];
     points[0] = 0.0f;
     points[1] = 1.0f;
     points[2] = 2.0f;
     points[3] = 3.0f;
 
-    mem->setPointCloudData(points);
+    _mem->setPointCloudData(points);
 
-    const float* data = mem->getPointCloudData();
+    const float* data = _mem->getPointCloudData();
     EXPECT_EQ(data[0], points[0]);
     EXPECT_EQ(data[1], points[1]);
     EXPECT_EQ(data[2], points[2]);

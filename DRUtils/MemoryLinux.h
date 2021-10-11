@@ -1,6 +1,7 @@
 #ifndef MEMORY_LINUX_H
 #define MEMORY_LINUX_H
 
+#include <cstddef>
 #include "Memory.h"
 
 namespace MHV
@@ -8,8 +9,8 @@ namespace MHV
     class MemoryLinux : public Memory
     {
         public:
-            MemoryLinux(int width, int height);
-            ~MemoryLinux();
+            MemoryLinux(size_t rgb_size, size_t depth_size, size_t point_cloud_size);
+            ~MemoryLinux() override;
             void setRGBData(const void* data) override;
             void setDepthData(const void* data) override;
             void setPointCloudData(const float* data) override;
@@ -24,8 +25,9 @@ namespace MHV
             int _rgbSharedMemory;
             int _depthSharedMemory;
             int _pointCloudSharedMemory;
-            int _width;
-            int _height;
+            size_t _rgb_size;
+            size_t _depth_size;
+            size_t _point_cloud_size;
     };
 }
 

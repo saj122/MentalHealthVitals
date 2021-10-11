@@ -30,8 +30,9 @@ namespace MHV
             std::string _rgbSharedMemory;
             std::string _depthSharedMemory;
             std::string _pointCloudSharedMemory;
-            size_t _width;
-            size_t _height;
+            size_t _rgb_size;
+            size_t _depth_size;
+            size_t _point_cloud_size;
     };
 }
 
