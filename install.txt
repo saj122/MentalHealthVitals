@@ -1,0 +1,36 @@
+Docker:
+
+1. docker build -t mental_health_image .
+
+#Note VS Code with extension remote development can connect to the running docker container and edit code.
+
+X11 on Mac OS X
+
+2. Install XQuartz
+3. Launch XQuartz
+4. Menu -> Preferences -> Security "Allow connections from network clients"
+5. xhost + ${hostname}
+6. export HOSTNAME='hostname'
+7. docker run --name MentalHealth --privileged --net host -e DISPLAY=:90 -v /tmp/.X11-unix:/tmp/.X11-unix --name MentalHealth mental_health_image
+	
+X11 on Linux
+
+2. docker run --name MentalHealth --privileged --net host -v /dev:/dev -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=:90 mental_health_image
+3. Open 3 terminals
+4. docker exec -it MentalHealth /bin/bash
+5. In one terminal, ""
+
+X11 on Windows
+
+2. Install VcXsrv Windows X Server
+3. set-variable -name DISPLAY -value YOUR-IP:0.0
+4. docker run -e DISPLAY=$DISPLAY --name MentalHealth mental_health_image
+
+Ubuntu 21.04:
+1. sudo apt install -y libgflags-dev libgoogle-glog-dev libgmock-dev libgtest-dev libopencv-dev curl cmake 
+2. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version. 
+   https://www.tensorflow.org/install/lang_c
+3. Extract to /usr/local
+4. Install Qt6 6.1.3 https://www.qt.io/download >> Go open source
+5. Install OpenNI SDK and driver for linux.
+	https://orbbec3d.com/develop/
