@@ -1,6 +1,7 @@
 # MentalHealthVitals
 
-###Build from source:
+### Build from source:
+
 OS - Ubuntu 21.04
 
 Install dependencies:
