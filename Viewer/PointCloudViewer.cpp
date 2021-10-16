@@ -19,11 +19,9 @@ MHV::PointCloudViewer::PointCloudViewer() : _mousePos(0.0,0.0)
 
     _viewMat.lookAt(QVector3D(0.0,0.0,10000.0), QVector3D(0.0,0.0,20000.0), QVector3D(0.0,1.0,0.0));
 
-    const float zNear = 0.01f, zFar = 100000.0f, fov = 15.0f;
-
     _projectionMat.setToIdentity();
 
-    _projectionMat.perspective(fov, WIDTH/HEIGHT, zNear, zFar);
+    _projectionMat.perspective(_fov, WIDTH/HEIGHT, _zNear, _zFar);
 }
 
 MHV::PointCloudViewer::~PointCloudViewer()
@@ -50,24 +48,6 @@ void MHV::PointCloudViewer::wheelEvent(QWheelEvent *e)
 
 void MHV::PointCloudViewer::mouseMoveEvent(QMouseEvent *e)
 {
-    if(e->buttons() == Qt::MiddleButton)
-    {
-        double diffX = (e->position().x() - _mousePos.x())/50.0;
-        double diffY = -(e->position().y() - _mousePos.y())/50.0;
-
-        QVector3D camRight = QVector3D(_viewMat.row(0)[0],_viewMat.row(1)[0], _viewMat.row(2)[0]);
-        QVector3D camForward = QVector3D(_viewMat.row(0)[2],_viewMat.row(1)[2], _viewMat.row(2)[2]);
-        QVector3D camPos = QVector3D(_viewMat.row(0)[3],_viewMat.row(1)[3], _viewMat.row(2)[3]);
-        QVector3D focus = QVector3D(0.0,0.0,15000.0);
-
-        float x = 15000.0*cos(diffY)*sin(diffX);
-        float y = 15000.0*sin(diffY)*sin(diffX);
-        float z = 15000.0*cos(diffX);
-
-        QVector3D newPos = camPos + QVector3D(x,y,z);
-
-        _viewMat.lookAt(newPos, focus, QVector3D(0.0,1.0,0.0));
-    }
     _mousePos = e->position();
 }
 
@@ -83,8 +63,7 @@ void MHV::PointCloudViewer::initializeGL()
 
     auto vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
     const char *vsrc =
-        "#version 330 core\n"
-        "layout (location = 0) in vec3 aPos;\n"
+        "attribute vec3 aPos;\n"
         "uniform mat4 mv;\n"
         "uniform mat4 p;\n"
         "void main()\n"
@@ -96,11 +75,9 @@ void MHV::PointCloudViewer::initializeGL()
 
     auto fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
     const char *fsrc =
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
         "void main()\n"
         "{\n"
-        "    FragColor = vec4(0.0,0.0,1.0,1.0);\n"
+        "    gl_FragColor = vec4(0.0,0.0,1.0,1.0);\n"
         "}\n";
     fshader->compileSourceCode(fsrc);
 
@@ -133,11 +110,9 @@ void MHV::PointCloudViewer::resizeGL(int w, int h)
 {
     auto aspect = (float)(w / h ? h : 1);
 
-    const float zNear = 0.01f, zFar = 100000.0f, fov = 15.0f;
-
     _projectionMat.setToIdentity();
 
-    _projectionMat.perspective(fov, aspect, zNear, zFar);
+    _projectionMat.perspective(_fov, aspect, _zNear, _zFar);
 }
 
 bool MHV::PointCloudViewer::makePointCloud()

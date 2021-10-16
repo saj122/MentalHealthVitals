@@ -35,10 +35,9 @@ void MHV::ImageViewer::initializeGL()
 
     std::unique_ptr<QOpenGLShader> vshader = std::make_unique<QOpenGLShader>(QOpenGLShader::Vertex, this);
     const char *vsrc =
-        "#version 330 core\n"
-        "layout (location = 0) in vec2 aPos;\n"
-        "layout (location = 1) in vec2 aTexCoord;\n"
-        "out vec2 textureCoords;\n"
+        "attribute vec2 aPos;\n"
+        "attribute vec2 aTexCoord;\n"
+        "varying vec2 textureCoords;\n"
         "void main()\n"
         "{\n"
         "    textureCoords = aTexCoord;\n"
@@ -48,13 +47,11 @@ void MHV::ImageViewer::initializeGL()
 
     std::unique_ptr<QOpenGLShader> fshader = std::make_unique<QOpenGLShader>(QOpenGLShader::Fragment, this);
     const char *fsrc =
-        "#version 330 core\n"
-        "in vec2 textureCoords;\n"
+        "varying vec2 textureCoords;\n"
         "uniform sampler2D texture;\n"
-        "out vec4 FragColor;\n"
         "void main()\n"
         "{\n"
-        "    FragColor = texture2D(texture, textureCoords);\n"
+        "    gl_FragColor = texture2D(texture, textureCoords);\n"
         "}\n";
     fshader->compileSourceCode(fsrc);
 

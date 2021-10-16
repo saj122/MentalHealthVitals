@@ -3,8 +3,7 @@
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLBuffer>
-#include <QOpenGLVertexArrayObject>
-#include <QOpenGLFunctions_3_3_Core>
+#include <QOpenGLFunctions>
 #include <QMatrix4x4>
 
 #include <memory>
@@ -18,7 +17,7 @@ namespace MHV
 
 namespace MHV
 {
-    class PointCloudViewer : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
+    class PointCloudViewer : public QOpenGLWidget, protected QOpenGLFunctions
     {
         Q_OBJECT
 
@@ -46,6 +45,9 @@ namespace MHV
             QMatrix4x4 _modelMat;
 
             QPointF _mousePos;
+            const float _zNear = 0.01f;
+            const float _zFar = 100000.0f;
+            const float _fov = 15.0f;
     };
 }
 
