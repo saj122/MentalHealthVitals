@@ -1,7 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "rapidjson/document.h"
+#include "document.h"
 #include <glog/logging.h>
 
 #include <string>
