@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 #include "./ui_MainWindow.h"
 
+#include "Config.h"
+
 #include "ImageViewer.h"
 #include "PointCloudViewer.h"
 
@@ -14,19 +16,36 @@ MHV::MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowTitle("Viewer");
 
-    ui->actionDepth->setCheckable(true);
-    ui->actionDepth->setChecked(false);
-    ui->actionDepth->setShortcut(QKeySequence(QString::fromStdString("Ctrl+D")));
-    ui->actionPoint_Cloud->setCheckable(true);
-    ui->actionPoint_Cloud->setChecked(false);
-    ui->actionPoint_Cloud->setShortcut(QKeySequence(QString::fromStdString("Ctrl+P")));
+    MHV::Config::loadConfig();
+    std::string type = MHV::Config::getType();
 
-    connect(ui->actionDepth, SIGNAL(toggled(bool)), this, SLOT(depthViewerChecked(bool)));
-    connect(ui->actionPoint_Cloud, SIGNAL(toggled(bool)), this, SLOT(pointCloudViewerChecked(bool)));
+    if(type.compare("RGBD") == 0)
+    {
+        ui->actionDepth->setCheckable(true);
+        ui->actionDepth->setChecked(false);
+        ui->actionDepth->setShortcut(QKeySequence(QString::fromStdString("Ctrl+D")));
+        ui->actionPoint_Cloud->setCheckable(true);
+        ui->actionPoint_Cloud->setChecked(false);
+        ui->actionPoint_Cloud->setShortcut(QKeySequence(QString::fromStdString("Ctrl+P")));
+
+        connect(ui->actionDepth, SIGNAL(toggled(bool)), this, SLOT(depthViewerChecked(bool)));
+        connect(ui->actionPoint_Cloud, SIGNAL(toggled(bool)), this, SLOT(pointCloudViewerChecked(bool)));
+
+        _depthViewer = std::make_unique<MHV::ImageViewer>(MHV::ImageViewer::Type::DEPTH);
+        _pointCloudViewer = std::make_unique<MHV::PointCloudViewer>();
+    }
+    else if(type.compare("RGB") == 0)
+    {
+        ui->actionDepth->setCheckable(false);
+        ui->actionDepth->setChecked(false);
+        ui->actionDepth->setVisible(false);
+        ui->actionPoint_Cloud->setCheckable(false);
+        ui->actionPoint_Cloud->setChecked(false);
+        ui->actionPoint_Cloud->setVisible(false);
+    }
 
     _rgbViewer = std::make_unique<MHV::ImageViewer>(MHV::ImageViewer::Type::RGB);
-    _depthViewer = std::make_unique<MHV::ImageViewer>(MHV::ImageViewer::Type::DEPTH);
-    _pointCloudViewer = std::make_unique<MHV::PointCloudViewer>();
+
     ui->gridLayout->addWidget(_rgbViewer.get());
 }
 

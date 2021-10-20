@@ -10,15 +10,16 @@
 
 MHV::ImageViewer::ImageViewer(Type type) : _viewerType(type)
 {
-    _utils = MemoryFactory::create(WIDTH*HEIGHT*3,WIDTH*HEIGHT*2,WIDTH*HEIGHT*3*sizeof(float));
-    startTimer(33);
+    _utils = MemoryFactory::create(WIDTH*HEIGHT*3);
+    startTimer(1);
 }
 
 MHV::ImageViewer::~ImageViewer()
 {
     makeCurrent();
     _vbo.destroy();
-    _texture->destroy();
+    if(_texture)
+        _texture->destroy();
     doneCurrent();
 }
 

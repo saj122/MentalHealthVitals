@@ -3,10 +3,7 @@
 
 #include <memory>
 
-namespace MHV
-{
-    class OpenNICamera;
-}
+#include "Camera.h"
 
 namespace MHV
 {
@@ -17,7 +14,8 @@ namespace MHV
             ~Controller();
             void start();
         private:
-            std::unique_ptr<MHV::OpenNICamera> _openNICamera;
+            std::unique_ptr<MHV::Camera> _camera;
+            const char* _settings;
     };
 }
 

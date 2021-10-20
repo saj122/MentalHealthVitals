@@ -14,6 +14,7 @@ if(WIN32)
             MemoryWindows.cpp
             MemoryWindows.h
             MemoryFactory.h
+            Config.h
     )
 elseif(UNIX)
     add_library(${PROJECT_NAME} STATIC
@@ -21,8 +22,11 @@ elseif(UNIX)
             MemoryLinux.h
             Memory.h
             MemoryFactory.h
+            Config.h
     )
 endif()
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/external/rapidjson)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glog::glog)
 

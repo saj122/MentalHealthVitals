@@ -18,6 +18,15 @@ namespace MHV
     class MemoryFactory
     {
         public:
+            static std::unique_ptr<MHV::Memory> create(size_t rgb_size)
+            {
+            #ifdef _WIN32
+                return std::make_unique<MHV::MemoryWindows>(rgb_size);
+            #else
+                return std::make_unique<MHV::MemoryLinux>(rgb_size);
+            #endif
+            }
+
             static std::unique_ptr<MHV::Memory> create(size_t rgb_size, size_t depth_size, size_t point_cloud_size)
             {
             #ifdef _WIN32

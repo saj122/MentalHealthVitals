@@ -6,14 +6,11 @@
 
 #include <math.h>
 
-#define WIDTH 640
-#define HEIGHT 480
-
-MHV::OpenNICamera::OpenNICamera() : _width(WIDTH),
-                                    _height(HEIGHT),
-                                    _streams(new openni::VideoStream*[2]())
+MHV::OpenNICamera::OpenNICamera(int width, int height) : _width(width),
+                                                         _height(height),
+                                                         _streams(new openni::VideoStream*[2]())
 {
-    _utils = MemoryFactory::create(WIDTH*HEIGHT*3,WIDTH*HEIGHT*2,WIDTH*HEIGHT*3*sizeof(float));
+    _utils = MemoryFactory::create(width*height*3,width*height*2,width*height*3*sizeof(float));
 }
 
 MHV::OpenNICamera::~OpenNICamera()
@@ -97,26 +94,11 @@ void MHV::OpenNICamera::init()
     _depthVideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_DEPTH_100_UM);
     _colorVideoMode.setFps(30);
     _depthVideoMode.setFps(30);
-    _colorVideoMode.setResolution(WIDTH,HEIGHT);
-    _depthVideoMode.setResolution(WIDTH,HEIGHT);
+    _colorVideoMode.setResolution(_width, _height);
+    _depthVideoMode.setResolution(_width, _height);
 
     _depth.setVideoMode(_depthVideoMode);
     _color.setVideoMode(_colorVideoMode);
-
-    int depthWidth = _depthVideoMode.getResolutionX();
-    int depthHeight = _depthVideoMode.getResolutionY();
-    int colorWidth = _colorVideoMode.getResolutionX();
-    int colorHeight = _colorVideoMode.getResolutionY();
-
-    if(depthWidth == colorWidth && depthHeight == colorHeight)
-    {
-        _width = depthWidth;
-        _height = depthHeight;
-    }
-    else
-    {
-        LOG(ERROR) << "Depth and color resolution are not the same.";
-    }
 
     LOG(INFO) << "Resolution X: " << _width;
     LOG(INFO) << "Resolution Y: " << _height;

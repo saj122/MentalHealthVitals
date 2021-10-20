@@ -9,6 +9,7 @@ namespace MHV
     class MemoryLinux : public Memory
     {
         public:
+            MemoryLinux(size_t rgb_size);
             MemoryLinux(size_t rgb_size, size_t depth_size, size_t point_cloud_size);
             ~MemoryLinux() override;
             void setRGBData(const void* data) override;

@@ -15,14 +15,14 @@ namespace MHV
 
 namespace MHV
 {
-    class OpenNICamera : Camera
+    class OpenNICamera : public Camera
     {
         public:
-            OpenNICamera();
-            ~OpenNICamera();
-            void init();
-            void run();
-            bool isValid();
+            OpenNICamera(int width, int height);
+            ~OpenNICamera() override;
+            void init() override;
+            void run() override;
+            bool isValid() override;
         private:
             std::vector<float> calculatePointCloud(const uint16_t* depth);
         private:
