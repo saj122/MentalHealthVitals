@@ -8,5 +8,5 @@
   - It may give you an error if you run through an IDE (depending on your settings)
 
 #### Command Line Arguments 
-To train: `python3 /src/emotions.py --mode train`
-To run: `python3 /src/emotions.py --mode display`
+- To train: `python3 /src/emotions.py --mode train`
+- To run: `python3 /src/emotions.py --mode display`
