@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(glog REQUIRED)
+find_package(RapidJSON REQUIRED)
 
 if(WIN32)
     add_library(${PROJECT_NAME} STATIC
@@ -26,7 +27,7 @@ elseif(UNIX)
     )
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/external/rapidjson)
+target_include_directories(${PROJECT_NAME} PRIVATE ${RAPIDJSON_INCLUDE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glog::glog)
 
