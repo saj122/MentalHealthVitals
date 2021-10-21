@@ -37,6 +37,7 @@ namespace MHV
         private:
             void makeImageTexture();
         private:
+            QOpenGLVertexArrayObject _vao;
             QOpenGLBuffer _vbo;
             std::unique_ptr<QOpenGLShaderProgram> _program;
             std::unique_ptr<QOpenGLTexture> _texture;

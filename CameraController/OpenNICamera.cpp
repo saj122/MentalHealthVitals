@@ -35,14 +35,14 @@ void MHV::OpenNICamera::init()
     if(rc != openni::Status::STATUS_OK)
     {
         openni::OpenNI::shutdown();
-        LOG(ERROR) << "Failed to open device.";
+        LOG(FATAL) << "Failed to initialize device.";
     }
 
     rc = _device.open(openni::ANY_DEVICE);
     if(rc != openni::Status::STATUS_OK)
     {
         openni::OpenNI::shutdown();
-        LOG(ERROR) << "Failed to open device.";
+        LOG(FATAL) << "Failed to open device.";
     }
 
     _device.setImageRegistrationMode(openni::ImageRegistrationMode::IMAGE_REGISTRATION_DEPTH_TO_COLOR);
@@ -55,13 +55,13 @@ void MHV::OpenNICamera::init()
         {
             _depth.destroy();
             openni::OpenNI::shutdown();
-            LOG(ERROR) << "Failed to start depth stream.";
+            LOG(FATAL) << "Failed to start depth stream.";
         }
     }
     else
     {
         openni::OpenNI::shutdown();
-        LOG(ERROR) << "Failed to create depth video stream.";
+        LOG(FATAL) << "Failed to create depth video stream.";
     }
 
     rc = _color.create(_device, openni::SENSOR_COLOR);
@@ -72,19 +72,19 @@ void MHV::OpenNICamera::init()
         {
             _color.destroy();
             openni::OpenNI::shutdown();
-            LOG(ERROR) << "Failed to start color stream.";
+            LOG(FATAL) << "Failed to start color stream.";
         }
     }
     else
     {
         openni::OpenNI::shutdown();
-        LOG(ERROR) << "Failed to create color video stream.";
+        LOG(FATAL) << "Failed to create color video stream.";
     }
 
     if (!_depth.isValid() && !_color.isValid())
     {
         openni::OpenNI::shutdown();
-        LOG(ERROR) << "No valid streams.";
+        LOG(FATAL) << "No valid streams.";
     }
 
     _depthVideoMode = _depth.getVideoMode();
@@ -100,8 +100,6 @@ void MHV::OpenNICamera::init()
     _depth.setVideoMode(_depthVideoMode);
     _color.setVideoMode(_colorVideoMode);
 
-    LOG(INFO) << "Resolution X: " << _width;
-    LOG(INFO) << "Resolution Y: " << _height;
     LOG(INFO) << "FPS: " << _colorVideoMode.getFps();
 
     _streams.get()[0] = &_depth;

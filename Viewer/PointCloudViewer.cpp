@@ -27,6 +27,7 @@ MHV::PointCloudViewer::PointCloudViewer() : _mousePos(0.0,0.0)
 MHV::PointCloudViewer::~PointCloudViewer()
 {
     makeCurrent();
+    _vao.destroy();
     _vbo.destroy();
     doneCurrent();
 }
@@ -63,7 +64,8 @@ void MHV::PointCloudViewer::initializeGL()
 
     auto vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
     const char *vsrc =
-        "attribute vec3 aPos;\n"
+        "#version 150 core\n"
+        "in vec3 aPos;\n"
         "uniform mat4 mv;\n"
         "uniform mat4 p;\n"
         "void main()\n"
@@ -75,9 +77,11 @@ void MHV::PointCloudViewer::initializeGL()
 
     auto fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
     const char *fsrc =
+        "#version 150 core\n"
+        "out vec4 FragColor;\n"
         "void main()\n"
         "{\n"
-        "    gl_FragColor = vec4(0.0,0.0,1.0,1.0);\n"
+        "    FragColor = vec4(0.0,0.0,1.0,1.0);\n"
         "}\n";
     fshader->compileSourceCode(fsrc);
 
@@ -87,6 +91,9 @@ void MHV::PointCloudViewer::initializeGL()
     _program->bindAttributeLocation("aPos", 0);
     _program->link();
     _program->bind();
+
+    _vao.create();
+    _vao.bind();
 }
 
 void MHV::PointCloudViewer::paintGL()

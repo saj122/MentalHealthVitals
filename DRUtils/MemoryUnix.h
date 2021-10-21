@@ -6,12 +6,12 @@
 
 namespace MHV
 {
-    class MemoryLinux : public Memory
+    class MemoryUnix : public Memory
     {
         public:
-            MemoryLinux(size_t rgb_size);
-            MemoryLinux(size_t rgb_size, size_t depth_size, size_t point_cloud_size);
-            ~MemoryLinux() override;
+            MemoryUnix(size_t rgb_size);
+            MemoryUnix(size_t rgb_size, size_t depth_size, size_t point_cloud_size);
+            ~MemoryUnix() override;
             void setRGBData(const void* data) override;
             void setDepthData(const void* data) override;
             void setPointCloudData(const float* data) override;

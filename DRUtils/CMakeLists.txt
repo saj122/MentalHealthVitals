@@ -9,23 +9,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(glog REQUIRED)
 find_package(RapidJSON REQUIRED)
 
-if(WIN32)
-    add_library(${PROJECT_NAME} STATIC
-            Memory.h
-            MemoryWindows.cpp
-            MemoryWindows.h
-            MemoryFactory.h
-            Config.h
-    )
-elseif(UNIX)
-    add_library(${PROJECT_NAME} STATIC
-            MemoryLinux.cpp
-            MemoryLinux.h
-            Memory.h
-            MemoryFactory.h
-            Config.h
-    )
-endif()
+add_library(${PROJECT_NAME} STATIC
+        MemoryUnix.cpp
+        MemoryUnix.h
+        Memory.h
+        MemoryFactory.h
+        Config.h
+)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${RAPIDJSON_INCLUDE_DIR})
 

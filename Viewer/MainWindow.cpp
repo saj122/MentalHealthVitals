@@ -28,20 +28,18 @@ MHV::MainWindow::MainWindow(QWidget *parent)
         ui->actionPoint_Cloud->setChecked(false);
         ui->actionPoint_Cloud->setShortcut(QKeySequence(QString::fromStdString("Ctrl+P")));
 
-        connect(ui->actionDepth, SIGNAL(toggled(bool)), this, SLOT(depthViewerChecked(bool)));
-        connect(ui->actionPoint_Cloud, SIGNAL(toggled(bool)), this, SLOT(pointCloudViewerChecked(bool)));
-
         _depthViewer = std::make_unique<MHV::ImageViewer>(MHV::ImageViewer::Type::DEPTH);
         _pointCloudViewer = std::make_unique<MHV::PointCloudViewer>();
+
+        connect(ui->actionDepth, SIGNAL(toggled(bool)), this, SLOT(depthViewerChecked(bool)));
+        connect(ui->actionPoint_Cloud, SIGNAL(toggled(bool)), this, SLOT(pointCloudViewerChecked(bool)));
     }
     else if(type.compare("RGB") == 0)
     {
         ui->actionDepth->setCheckable(false);
         ui->actionDepth->setChecked(false);
-        ui->actionDepth->setVisible(false);
         ui->actionPoint_Cloud->setCheckable(false);
         ui->actionPoint_Cloud->setChecked(false);
-        ui->actionPoint_Cloud->setVisible(false);
     }
 
     _rgbViewer = std::make_unique<MHV::ImageViewer>(MHV::ImageViewer::Type::RGB);

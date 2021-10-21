@@ -3,6 +3,7 @@
 
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
 #include <QOpenGLFunctions>
 #include <QMatrix4x4>
 
@@ -35,6 +36,7 @@ namespace MHV
         private:
             bool makePointCloud();
         private:
+            QOpenGLVertexArrayObject _vao;
             QOpenGLBuffer _vbo;
             std::unique_ptr<QOpenGLShaderProgram> _program;
 

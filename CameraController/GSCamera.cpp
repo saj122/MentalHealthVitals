@@ -25,13 +25,20 @@ MHV::GSCamera::~GSCamera()
 
 void MHV::GSCamera::init()
 {
-    LOG(INFO) << "Init GST.";
+    LOG(INFO) << "Initialize GST.";
     gst_init(NULL, NULL);
 
-    LOG(INFO) << "Creating pipeline.";
+#if __APPLE__
     _pipeline = gst_parse_launch(
-                "v4l2src device=/dev/video0 ! videoconvert ! video/x-raw, width=640, height=480, format=RGB ! appsink name=sink",
+                "avfvideosrc ! videoconvert ! video/x-raw, width=640, height=480, format=RGB ! appsink name=sink",
                 nullptr);
+#elif __linux__
+    _pipeline = gst_parse_launch(
+                "v4l2src ! videoconvert ! video/x-raw, width=640, height=480, format=RGB ! appsink name=sink",
+                nullptr);
+#else
+#   error "Unknown compiler"
+#endif
 
     gst_element_set_state (_pipeline, GST_STATE_PLAYING);
 
@@ -50,7 +57,7 @@ void MHV::GSCamera::run()
         _sample = gst_app_sink_pull_sample(GST_APP_SINK(_sink));
         if (_sample == NULL)
         {
-            LOG(ERROR) << "Failed to get sample.";
+            LOG(FATAL) << "Failed to get sample. Another process using camera or camera disconnected?";
             return;
         }
 

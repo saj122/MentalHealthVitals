@@ -1,4 +1,4 @@
-#include "MemoryLinux.h"
+#include "MemoryUnix.h"
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -7,7 +7,7 @@
 
 #include <glog/logging.h>
 
-MHV::MemoryLinux::MemoryLinux(size_t rgb_size) : _rgbData(new unsigned char[rgb_size]),
+MHV::MemoryUnix::MemoryUnix(size_t rgb_size) : _rgbData(new unsigned char[rgb_size]),
                                                  _depthData(nullptr),
                                                  _pointCloudData(nullptr),
                                                  _rgbSharedMemory(0),
@@ -20,7 +20,7 @@ MHV::MemoryLinux::MemoryLinux(size_t rgb_size) : _rgbData(new unsigned char[rgb_
 
 }
 
-MHV::MemoryLinux::MemoryLinux(size_t rgb_size, size_t depth_size, size_t point_cloud_size) : _rgbData(new unsigned char[rgb_size]),
+MHV::MemoryUnix::MemoryUnix(size_t rgb_size, size_t depth_size, size_t point_cloud_size) : _rgbData(new unsigned char[rgb_size]),
                                                                                              _depthData(new unsigned char[depth_size]),
                                                                                              _pointCloudData(new float[point_cloud_size]),
                                                                                              _rgbSharedMemory(0),
@@ -33,7 +33,7 @@ MHV::MemoryLinux::MemoryLinux(size_t rgb_size, size_t depth_size, size_t point_c
 
 }
 
-MHV::MemoryLinux::~MemoryLinux()
+MHV::MemoryUnix::~MemoryUnix()
 {
     delete[] _rgbData;
     if(_depthData)
@@ -46,7 +46,7 @@ MHV::MemoryLinux::~MemoryLinux()
     shmctl(_pointCloudSharedMemory,IPC_RMID,NULL);
 }
 
-void MHV::MemoryLinux::setRGBData(const void* data)
+void MHV::MemoryUnix::setRGBData(const void* data)
 {
     _rgbSharedMemory = shmget((key_t)123, _rgb_size, 0666|IPC_CREAT);
     LOG_IF(ERROR, _rgbSharedMemory == -1) << "Couldn't set RGB shared memory.";
@@ -58,7 +58,7 @@ void MHV::MemoryLinux::setRGBData(const void* data)
     shmdt(shmData);
 }
 
-void MHV::MemoryLinux::setDepthData(const void* data)
+void MHV::MemoryUnix::setDepthData(const void* data)
 {
     if(_depthData)
     {
@@ -73,7 +73,7 @@ void MHV::MemoryLinux::setDepthData(const void* data)
     }
 }
 
-void MHV::MemoryLinux::setPointCloudData(const float* data)
+void MHV::MemoryUnix::setPointCloudData(const float* data)
 {
     if(_pointCloudData)
     {
@@ -88,7 +88,7 @@ void MHV::MemoryLinux::setPointCloudData(const float* data)
     }
 }
 
-const unsigned char* MHV::MemoryLinux::getRGBData()
+const unsigned char* MHV::MemoryUnix::getRGBData()
 {
     _rgbSharedMemory = shmget((key_t)123, _rgb_size, 0666|IPC_CREAT);
     LOG_IF(ERROR, _rgbSharedMemory == -1) << "Couldn't get RGB shared memory.";
@@ -102,7 +102,7 @@ const unsigned char* MHV::MemoryLinux::getRGBData()
     return _rgbData;
 }
 
-const unsigned char* MHV::MemoryLinux::getDepthData()
+const unsigned char* MHV::MemoryUnix::getDepthData()
 {
     if(_depthData)
     {
@@ -118,7 +118,7 @@ const unsigned char* MHV::MemoryLinux::getDepthData()
     return _depthData;
 }
 
-const float* MHV::MemoryLinux::getPointCloudData()
+const float* MHV::MemoryUnix::getPointCloudData()
 {
     if(_pointCloudData)
     {

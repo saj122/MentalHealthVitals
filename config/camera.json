@@ -1,6 +1,6 @@
 {
-    "Source": "V4L",
-    "Type": "RGB",
+    "Source": "OpenNI",
+    "Type": "RGBD",
     "Width": 640,
     "Height": 480
 }

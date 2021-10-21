@@ -10,7 +10,10 @@
 
 MHV::ImageViewer::ImageViewer(Type type) : _viewerType(type)
 {
-    _utils = MemoryFactory::create(WIDTH*HEIGHT*3);
+    if(_viewerType == Type::RGB)
+        _utils = MemoryFactory::create(WIDTH*HEIGHT*3);
+    else
+        _utils = MemoryFactory::create(WIDTH*HEIGHT*3, WIDTH*HEIGHT*2, 0);
     startTimer(1);
 }
 
@@ -18,6 +21,7 @@ MHV::ImageViewer::~ImageViewer()
 {
     makeCurrent();
     _vbo.destroy();
+    _vao.destroy();
     if(_texture)
         _texture->destroy();
     doneCurrent();
@@ -36,9 +40,10 @@ void MHV::ImageViewer::initializeGL()
 
     std::unique_ptr<QOpenGLShader> vshader = std::make_unique<QOpenGLShader>(QOpenGLShader::Vertex, this);
     const char *vsrc =
-        "attribute vec2 aPos;\n"
-        "attribute vec2 aTexCoord;\n"
-        "varying vec2 textureCoords;\n"
+        "#version 150 core\n"
+        "in vec2 aPos;\n"
+        "in vec2 aTexCoord;\n"
+        "out vec2 textureCoords;\n"
         "void main()\n"
         "{\n"
         "    textureCoords = aTexCoord;\n"
@@ -48,11 +53,13 @@ void MHV::ImageViewer::initializeGL()
 
     std::unique_ptr<QOpenGLShader> fshader = std::make_unique<QOpenGLShader>(QOpenGLShader::Fragment, this);
     const char *fsrc =
-        "varying vec2 textureCoords;\n"
-        "uniform sampler2D texture;\n"
+        "#version 150 core\n"
+        "in vec2 textureCoords;\n"
+        "uniform sampler2D tex;\n"
+        "out vec4 FragColor;\n"
         "void main()\n"
         "{\n"
-        "    gl_FragColor = texture2D(texture, textureCoords);\n"
+        "    FragColor = texture(tex, textureCoords);\n"
         "}\n";
     fshader->compileSourceCode(fsrc);
 
@@ -64,7 +71,10 @@ void MHV::ImageViewer::initializeGL()
     _program->link();
 
     _program->bind();
-    _program->setUniformValue("texture", 0);
+    _program->setUniformValue("tex", 0);
+
+    _vao.create();
+    _vao.bind();
 }
 
 void MHV::ImageViewer::paintGL()
