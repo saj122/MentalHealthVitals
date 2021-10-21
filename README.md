@@ -1,6 +1,19 @@
 # MentalHealthVitals
 
 ### Build from source:
+OS - Mac OS X
+
+Install dependencies:
+1. Install homebrew.
+2. brew install cmake rapidjson glog gflags googletest libtensorflow qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config
+
+Build:
+
+    mkdir build 
+    cd build
+    cmake -G Xcode ..
+    Open project in xcode and BUILD_ALL.
+
 
 OS - Ubuntu 21.04
 
@@ -10,8 +23,6 @@ Install dependencies:
    https://www.tensorflow.org/install/lang_c
 3. Extract to /usr/local - sudo tar -C /usr/local -xzf <FILE>.tar.gz && sudo ldconfig
 4. Run as sudo and install Qt6 6.1.3 https://www.qt.io/download >> Go open source
-5. Install OpenNI SDK and driver for linux.
-   https://orbbec3d.com/develop/
 
 Build:
 
