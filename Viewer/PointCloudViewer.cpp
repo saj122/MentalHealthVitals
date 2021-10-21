@@ -12,9 +12,9 @@
 
 MHV::PointCloudViewer::PointCloudViewer() : _mousePos(0.0,0.0)
 {
-    _utils = MemoryFactory::create(WIDTH*HEIGHT*3,WIDTH*HEIGHT*2,WIDTH*HEIGHT*3*sizeof(float));
+    _utils = MemoryFactory::create(WIDTH*HEIGHT*3,WIDTH*HEIGHT*2,WIDTH*HEIGHT*3);
 
-    startTimer(33);
+    startTimer(1);
     _modelMat.setToIdentity();
 
     _viewMat.lookAt(QVector3D(0.0,0.0,10000.0), QVector3D(0.0,0.0,20000.0), QVector3D(0.0,1.0,0.0));
@@ -102,15 +102,16 @@ void MHV::PointCloudViewer::paintGL()
     glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), clearColor.alphaF());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    makePointCloud();
+    if(makePointCloud())
+    {
+        _program->enableAttributeArray(0);
+        _program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
 
-    _program->enableAttributeArray(0);
-    _program->setAttributeBuffer(0, GL_FLOAT, 0, 3, 3*sizeof(GLfloat));
+        _program->setUniformValue("mv", _viewMat * _modelMat);
+        _program->setUniformValue("p", _projectionMat);
 
-    _program->setUniformValue("mv", _viewMat * _modelMat);
-    _program->setUniformValue("p", _projectionMat);
-
-    glDrawArrays(GL_POINTS, 0, WIDTH*HEIGHT);
+        glDrawArrays(GL_POINTS, 0, WIDTH*HEIGHT);
+    }
 }
 
 void MHV::PointCloudViewer::resizeGL(int w, int h)

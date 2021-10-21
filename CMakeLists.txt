@@ -4,6 +4,8 @@ project(DepressionRecognition)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
+add_compile_definitions(CONFIG_PATH=\"${CMAKE_SOURCE_DIR}/config/camera.json\")
+
 include(CTest)
 
 add_subdirectory(DRUtils)

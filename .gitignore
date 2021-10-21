@@ -12,7 +12,6 @@
 *.pch
 
 # Compiled Dynamic libraries
-*.dylib
 *.dll
 
 # Fortran module files
@@ -38,10 +37,4 @@ build_minsizerel
 build_release
 build_relwithdebug
 .idea
-external/libtensorflow
-external/gflags
-external/glog
-external/qt6
-external/gtest
-external/opencv
 cmake-build-debug

@@ -13,7 +13,7 @@ MHV::ImageViewer::ImageViewer(Type type) : _viewerType(type)
     if(_viewerType == Type::RGB)
         _utils = MemoryFactory::create(WIDTH*HEIGHT*3);
     else
-        _utils = MemoryFactory::create(WIDTH*HEIGHT*3, WIDTH*HEIGHT*2, 0);
+        _utils = MemoryFactory::create(WIDTH*HEIGHT*3, WIDTH*HEIGHT*2, WIDTH*HEIGHT*3);
     startTimer(1);
 }
 

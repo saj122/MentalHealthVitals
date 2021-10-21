@@ -57,8 +57,11 @@ namespace MHV
         private:
             static void readSettings()
             {
+#ifndef CONFIG_PATH
+                LOG(FATAL) << "Config path not set in cmake.";
+#endif
                 std::string line;
-                std::ifstream in("/home/stephen/git/MentalHealthVitals/config/camera.json");
+                std::ifstream in(CONFIG_PATH);
                 while(std::getline(in, line))
                 {
                     _json += line + "\n";
