@@ -1,21 +1,23 @@
 #define GOOGLE_STRIP_LOG 1
 #include <glog/logging.h>
 
+#include <tensorflow/c/c_api.h>
+
 #include <opencv2/opencv.hpp>
-//#include <opencv2/objdetect.hpp>
 
 #include "MemoryFactory.h"
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[])
+{
     google::InitGoogleLogging(argv[0]);
 
 #ifndef NDEBUG
     FLAGS_logtostderr = 1;
     FLAGS_minloglevel = 0;
 #endif
-    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create(640*480*3, 640*480*2, 640*480*3*sizeof(float));
+    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create(640*480*3, 640*480*2, 640*480*3);
 
-    cv::CascadeClassifier clfr("../../ImageProcessing/models/haarcascade_frontalface_default.xml");
+    cv::CascadeClassifier clfr(HAARCASCADE_PATH);
 
     std::vector<cv::Rect> features;
 

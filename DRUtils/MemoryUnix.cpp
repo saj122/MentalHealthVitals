@@ -8,27 +8,35 @@
 #include <glog/logging.h>
 
 MHV::MemoryUnix::MemoryUnix(size_t rgb_size) : _rgbData(new unsigned char[rgb_size]),
-                                                 _depthData(nullptr),
-                                                 _pointCloudData(nullptr),
-                                                 _rgbSharedMemory(0),
-                                                 _depthSharedMemory(0),
-                                                 _pointCloudSharedMemory(0),
-                                                 _rgb_size(rgb_size),
-                                                 _depth_size(0),
-                                                 _point_cloud_size(0)
+                                               _depthData(nullptr),
+                                               _pointCloudData(nullptr),
+                                               _detectionData(new float[4]),
+                                               _emotionData(new char[12]),
+                                               _rgbSharedMemory(0),
+                                               _depthSharedMemory(0),
+                                               _pointCloudSharedMemory(0),
+                                               _detectionMemory(0),
+                                               _emotionMemory(0),
+                                               _rgb_size(rgb_size),
+                                               _depth_size(0),
+                                               _point_cloud_size(0)
 {
 
 }
 
 MHV::MemoryUnix::MemoryUnix(size_t rgb_size, size_t depth_size, size_t point_cloud_size) : _rgbData(new unsigned char[rgb_size]),
-                                                                                             _depthData(new unsigned char[depth_size]),
-                                                                                             _pointCloudData(new float[point_cloud_size]),
-                                                                                             _rgbSharedMemory(0),
-                                                                                             _depthSharedMemory(0),
-                                                                                             _pointCloudSharedMemory(0),
-                                                                                             _rgb_size(rgb_size),
-                                                                                             _depth_size(depth_size),
-                                                                                             _point_cloud_size(point_cloud_size)
+                                                                                           _depthData(new unsigned char[depth_size]),
+                                                                                           _pointCloudData(new float[point_cloud_size]),
+                                                                                           _detectionData(new float[4]),
+                                                                                           _emotionData(new char[12]),
+                                                                                           _rgbSharedMemory(0),
+                                                                                           _depthSharedMemory(0),
+                                                                                           _pointCloudSharedMemory(0),
+                                                                                           _detectionMemory(0),
+                                                                                           _emotionMemory(0),
+                                                                                           _rgb_size(rgb_size),
+                                                                                           _depth_size(depth_size),
+                                                                                           _point_cloud_size(point_cloud_size)
 {
 
 }
@@ -36,6 +44,8 @@ MHV::MemoryUnix::MemoryUnix(size_t rgb_size, size_t depth_size, size_t point_clo
 MHV::MemoryUnix::~MemoryUnix()
 {
     delete[] _rgbData;
+    delete[] _detectionData;
+    delete[] _emotionData;
     if(_depthData)
         delete[] _depthData;
     if(_pointCloudData)
@@ -44,6 +54,8 @@ MHV::MemoryUnix::~MemoryUnix()
     shmctl(_rgbSharedMemory,IPC_RMID,NULL);
     shmctl(_depthSharedMemory,IPC_RMID,NULL);
     shmctl(_pointCloudSharedMemory,IPC_RMID,NULL);
+    shmctl(_detectionMemory,IPC_RMID,NULL);
+    shmctl(_emotionMemory,IPC_RMID,NULL);
 }
 
 void MHV::MemoryUnix::setRGBData(const void* data)
@@ -85,7 +97,7 @@ void MHV::MemoryUnix::setPointCloudData(const float* data)
 {
     if(_pointCloudData)
     {
-        _pointCloudSharedMemory = shmget((key_t)789, _point_cloud_size, 0666|IPC_CREAT);
+        _pointCloudSharedMemory = shmget((key_t)789, _point_cloud_size*4, 0666|IPC_CREAT);
         if(_pointCloudSharedMemory == -1)
         {
             LOG(ERROR) << "Couldn't get point cloud shared memory.";
@@ -93,10 +105,20 @@ void MHV::MemoryUnix::setPointCloudData(const float* data)
         }
         float* shmData = (float*)shmat(_pointCloudSharedMemory, NULL, 0);
 
-        std::memcpy(shmData, data, _point_cloud_size);
+        std::memcpy(shmData, data, _point_cloud_size*4);
 
         shmdt(shmData);
     }
+}
+
+void MHV::MemoryUnix::setDetectionBoxes(const float* data)
+{
+
+}
+
+void MHV::MemoryUnix::setEmotionState(const char* data)
+{
+
 }
 
 const unsigned char* MHV::MemoryUnix::getRGBData()
@@ -141,7 +163,7 @@ const float* MHV::MemoryUnix::getPointCloudData()
 {
     if(_pointCloudData)
     {
-        _pointCloudSharedMemory = shmget((key_t)789, _point_cloud_size, 0666|IPC_CREAT);
+        _pointCloudSharedMemory = shmget((key_t)789, _point_cloud_size*4, 0666|IPC_CREAT);
         if(_pointCloudSharedMemory == -1)
         {
             LOG(ERROR) << "Couldn't get point cloud shared memory.";
@@ -150,10 +172,20 @@ const float* MHV::MemoryUnix::getPointCloudData()
 
         void* cloud = shmat(_pointCloudSharedMemory, NULL, 0);
 
-        std::memcpy(_pointCloudData, cloud, _point_cloud_size);
+        std::memcpy(_pointCloudData, cloud, _point_cloud_size*4);
 
         shmdt(cloud);
     }
 
     return _pointCloudData;
+}
+
+const float* MHV::MemoryUnix::getDetectionBoxes()
+{
+
+}
+
+const char* MHV::MemoryUnix::getEmotionState()
+{
+
 }
