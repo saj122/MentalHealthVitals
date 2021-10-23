@@ -8,7 +8,7 @@ Install dependencies:
 2. Run in terminal
    
        xcode-select --install
-       brew install libbson mongo-c-driver cmake rapidjson glog gflags googletest libtensorflow qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config
+       brew install mongo-c-driver cmake rapidjson glog gflags googletest libtensorflow qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config
        brew tap mongodb/brew
        brew install mongodb-community@5.0
        brew services start mongodb-community@5.0
@@ -17,7 +17,7 @@ Install dependencies:
        curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.6.6/mongo-cxx-driver-r3.6.6.tar.gz
        tar -xzf mongo-cxx-driver-r3.6.6.tar.gz
        cd mongo-cxx-driver-r3.6.6/build
-       cmake .. -DCMAKE_BUILD_TYPE=Releas -DCMAKE_INSTALL_PREFIX=/usr/local
+       cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/usr/local/opt/mongo-c-driver/lib/cmake -DCMAKE_INSTALL_PREFIX=/usr/local
        sudo cmake --build . --target EP_mnmlstc_core
        cmake --build .
        sudo cmake --build . --target install
@@ -27,7 +27,7 @@ Install dependencies:
        cd Open3D
        mkdir build
        cd build
-       cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
+       cmake -DBUILD_SHARED_LIBS=ON -DBUILD_GUI=OFF -DBUILD_WEBRTC=OFF DCMAKE_INSTALL_PREFIX=/usr/local ..
        make -j$(sysctl -n hw.physicalcpu)
        sudo make install
 
@@ -44,13 +44,13 @@ OS - Ubuntu 21.04
 Install dependencies:
 1. Run in terminal
        
-       sudo apt install -y libc++-dev libc++abi-dev libmongoc-dev libbson-dev gnugpg libgflags-dev libgoogle-glog-dev libgmock-dev libgtest-dev libopencv-dev curl cmake git
+       sudo apt update && sudo apt install -y libc++-dev libc++abi-dev libmongoc-dev libbson-dev gnugpg libgflags-dev libgoogle-glog-dev libgmock-dev libgtest-dev libopencv-dev curl cmake git wget
 2. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version.
    https://www.tensorflow.org/install/lang_c
 3. Extract to /usr/local 
 
        sudo tar -C /usr/local -xzf <FILE>.tar.gz && sudo ldconfig
-4. Run as sudo and install Qt6 6.1.3 https://www.qt.io/download >> Go open source
+4. Run as sudo and install Qt6 6.1.3 https://www.qt.io/download >> Go open source or install aqtinstall and install from the cli
 5. Install mongodb
 
        wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
@@ -64,7 +64,7 @@ Install dependencies:
        curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.6.6/mongo-cxx-driver-r3.6.6.tar.gz
        tar -xzf mongo-cxx-driver-r3.6.6.tar.gz
        cd mongo-cxx-driver-r3.6.6/build
-       cmake .. -DCMAKE_BUILD_TYPE=Releas -DCMAKE_INSTALL_PREFIX=/usr/local
+       cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
        sudo cmake --build . --target EP_mnmlstc_core
        cmake --build .
        sudo cmake --build . --target install
