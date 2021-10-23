@@ -44,7 +44,7 @@ OS - Ubuntu 21.04
 Install dependencies:
 1. Run in terminal
        
-       sudo apt update && sudo apt install -y libc++-dev libc++abi-dev libmongoc-dev libbson-dev gnugpg libgflags-dev libgoogle-glog-dev libgmock-dev libgtest-dev libopencv-dev curl cmake git wget
+       sudo apt update && sudo apt install -y libc++-dev libc++abi-dev libmongoc-dev libbson-dev libgflags-dev libgoogle-glog-dev libgmock-dev libgtest-dev libopencv-dev curl cmake git wget
 2. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version.
    https://www.tensorflow.org/install/lang_c
 3. Extract to /usr/local 
