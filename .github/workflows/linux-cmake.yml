@@ -51,38 +51,44 @@ jobs:
     - name: Extract Tar
       run: tar -xzf mongo-cxx-driver-r3.6.6.tar.gz
       
-    - name: Change to Build Dir
-      run: cd mongo-cxx-driver-r3.6.6/build
-      
     - name: Generate Build Files
       run: cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
       
     - name: Build Mongo Core
       run: sudo cmake --build . --target EP_mnmlstc_core
+      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
       
     - name: Build Driver
       run: cmake --build .
+      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
       
     - name: Install Driver
       run: sudo cmake --build . --target install
+      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
           
     - name: Download Open3D
       run: git clone --recursive https://github.com/intel-isl/Open3D.git
      
     - name: Change Dir & Install Deps
-      run: cd Open3D/util && ./install_deps_ubuntu.sh
+      run: ./install_deps_ubuntu.sh
+      working-directory: ${{github.workspace}}/Open3D/util
       
     - name: Change to Build Dir
-      run: cd .. && mkdir build && cd build
+      run: mkdir build 
+      working-directory: ${{github.workspace}}/Open3D
       
     - name: Generate Build Files
       run: cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
+      working-directory: ${{github.workspace}}/Open3D/build
       
     - name: Build Open3D
       run: make -j$(nproc)
+      working-directory: ${{github.workspace}}/Open3D/build
       
     - name: Install Open3D
       run: sudo make install
+      working-directory: ${{github.workspace}}/Open3D/build
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build
