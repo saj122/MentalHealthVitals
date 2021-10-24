@@ -101,7 +101,7 @@ jobs:
       working-directory: ${{github.workspace}}/Open3D
       
     - name: Generate Build Files
-      run: cmake -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
+      run: cmake -DBUILD_SHARED_LIBS=ON -DBUILD_PYTHON_MODULE=OFF -DCMAKE_INSTALL_PREFIX=/usr/local ..
       working-directory: ${{github.workspace}}/Open3D/build
       
     - name: Build Open3D
