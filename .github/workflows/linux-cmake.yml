@@ -40,7 +40,7 @@ jobs:
       run: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
       
     - name: Install Mongo
-      run: sudo apt update && sudo apt-get install -y mongodb-org
+      run: sudo apt update && sudo apt-get install -y mongodb-org libmongoc-1.0-0
       
     - name: Start Mongo and Reload Daemon
       run: sudo systemctl start mongod && sudo systemctl daemon-reload
