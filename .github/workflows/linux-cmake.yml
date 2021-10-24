@@ -40,10 +40,32 @@ jobs:
       run: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
       
     - name: Install Mongo
-      run: sudo apt update && sudo apt-get install -y mongodb-org libmongoc-1.0-0
+      run: sudo apt update && sudo apt-get install -y mongodb-org libssl-dev libsasl2-dev
       
     - name: Start Mongo and Reload Daemon
       run: sudo systemctl start mongod && sudo systemctl daemon-reload
+      
+    - name: Download Mongodb-c-driver
+      run: wget https://github.com/mongodb/mongo-c-driver/releases/download/1.19.1/mongo-c-driver-1.19.1.tar.gz
+      
+    - name: Extract Tar
+      run: tar -xzf mongo-c-driver-1.19.1.tar.gz
+      
+    - name: Make Dir Build
+      run: mkdir cmake-build
+      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1
+      
+    - name: Generate Build Files
+      run: cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
+      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1/cmake-build
+      
+    - name: Build Files
+      run: make -j$(nproc)
+      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1/cmake-build
+      
+    - name: Install Mongoc
+      run: sudo make install
+      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1/cmake-build
       
     - name: Download Mongodb-cxx-driver
       run: curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.6.6/mongo-cxx-driver-r3.6.6.tar.gz
