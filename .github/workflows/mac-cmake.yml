@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Homebrew Deps
-        run: brew install mongo-c-driver cmake rapidjson glog gflags googletest libtensorflow qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config
+        run: brew install openssl mongo-c-driver cmake rapidjson glog gflags googletest libtensorflow qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config
         
       - name: Setup Mongo
         run: brew tap mongodb/brew
