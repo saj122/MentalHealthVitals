@@ -18,12 +18,15 @@ jobs:
 
       - name: Install Homebrew Deps
         run: brew install ossp-uuid openssl cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3
-            
+      
+      - name: Create Symlinks for Openssl
+        run: brew link openssl --force
+      
       - name: Download Tensorflow
         run: wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz
       
       - name: Extract Tar
-        run: sudo tar -C /usr/local -xzf libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz
+        run: sudo tar xf libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz -C /usr/local
             
       - name: Configure CMake
         run: cmake -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3 -DOPENSSL_LIBRARIES=/opt/homebrew/opt/openssl@3/lib -B ${{github.workspace}}/build
