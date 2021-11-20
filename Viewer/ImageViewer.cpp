@@ -5,6 +5,8 @@
 
 #include "MemoryFactory.h"
 
+#include "glog/logging.h"
+
 #define WIDTH 640
 #define HEIGHT 480
 
@@ -109,6 +111,8 @@ void MHV::ImageViewer::paintGL()
        makeImageTexture();
    }
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+   //const int* data = _utils->getDetectionBox();
 }
 
 void MHV::ImageViewer::resizeGL(int w, int h)

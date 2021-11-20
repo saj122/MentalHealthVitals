@@ -3,6 +3,8 @@
 #include <QApplication>
 #include <QSurfaceFormat>
 
+#include <stdio.h>
+
 int main(int argc, char *argv[])
 {
     QSurfaceFormat fmt;
@@ -13,6 +15,9 @@ int main(int argc, char *argv[])
     QSurfaceFormat::setDefaultFormat(fmt);
 
     QApplication::setAttribute(Qt::AA_UseDesktopOpenGL);
+
+    //system("../../start.sh");
+
     QApplication a(argc, argv);
     MHV::MainWindow w;
     w.show();

@@ -10,8 +10,8 @@
 MHV::MemoryUnix::MemoryUnix(size_t rgb_size) : _rgbData(new unsigned char[rgb_size]),
                                                _depthData(nullptr),
                                                _pointCloudData(nullptr),
-                                               _detectionData(new float[4]),
-                                               _emotionData(new char[12]),
+                                               _detectionData(new int[4]),
+                                               _emotionData(new char[100]),
                                                _rgbSharedMemory(0),
                                                _depthSharedMemory(0),
                                                _pointCloudSharedMemory(0),
@@ -27,8 +27,8 @@ MHV::MemoryUnix::MemoryUnix(size_t rgb_size) : _rgbData(new unsigned char[rgb_si
 MHV::MemoryUnix::MemoryUnix(size_t rgb_size, size_t depth_size, size_t point_cloud_size) : _rgbData(new unsigned char[rgb_size]),
                                                                                            _depthData(new unsigned char[depth_size]),
                                                                                            _pointCloudData(new float[point_cloud_size]),
-                                                                                           _detectionData(new float[4]),
-                                                                                           _emotionData(new char[12]),
+                                                                                           _detectionData(new int[4]),
+                                                                                           _emotionData(new char[100]),
                                                                                            _rgbSharedMemory(0),
                                                                                            _depthSharedMemory(0),
                                                                                            _pointCloudSharedMemory(0),
@@ -111,14 +111,40 @@ void MHV::MemoryUnix::setPointCloudData(const float* data)
     }
 }
 
-void MHV::MemoryUnix::setDetectionBoxes(const float* data)
+void MHV::MemoryUnix::setDetectionBox(const int* data)
 {
+    if(_detectionData)
+    {
+        _detectionMemory = shmget((key_t)987, 4*sizeof(int), 0666|IPC_CREAT);
+        if(_detectionMemory == -1)
+        {
+            LOG(ERROR) << "Couldn't get detection shared memory.";
+            return;
+        }
+        float* shmData = (float*)shmat(_detectionMemory, NULL, 0);
 
+        std::memcpy(shmData, data, 4*sizeof(int));
+
+        shmdt(shmData);
+    }
 }
 
 void MHV::MemoryUnix::setEmotionState(const char* data)
 {
+    if(_emotionData)
+    {
+        _emotionMemory = shmget((key_t)654, 100*sizeof(char), 0666|IPC_CREAT);
+        if(_emotionMemory == -1)
+        {
+            LOG(ERROR) << "Couldn't get emotion shared memory.";
+            return;
+        }
+        float* shmData = (float*)shmat(_emotionMemory, NULL, 0);
 
+        std::memcpy(shmData, data, 100*sizeof(char));
+
+        shmdt(shmData);
+    }
 }
 
 const unsigned char* MHV::MemoryUnix::getRGBData()
@@ -180,12 +206,43 @@ const float* MHV::MemoryUnix::getPointCloudData()
     return _pointCloudData;
 }
 
-const float* MHV::MemoryUnix::getDetectionBoxes()
+const int* MHV::MemoryUnix::getDetectionBox()
 {
+    if(_detectionData)
+    {
+        _detectionMemory = shmget((key_t)987, 4*sizeof(int), 0666|IPC_CREAT);
+        if(_detectionMemory == -1)
+        {
+            LOG(ERROR) << "Couldn't get detection shared memory.";
+            return nullptr;
+        }
 
+        void* box = shmat(_detectionMemory, NULL, 0);
+
+        std::memcpy(_detectionData, box, 4*sizeof(int));
+
+        shmdt(box);
+    }
+
+    return _detectionData;
 }
 
 const char* MHV::MemoryUnix::getEmotionState()
 {
+    if(_emotionData)
+    {
+        _emotionMemory = shmget((key_t)654,  100*sizeof(char), 0666|IPC_CREAT);
+        if(_emotionMemory == -1)
+        {
+            LOG(ERROR) << "Couldn't get emotion shared memory.";
+            return nullptr;
+        }
 
+        void* emot = shmat(_emotionMemory, NULL, 0);
+
+        std::memcpy(_emotionData, emot, 100*sizeof(char));
+
+        shmdt(emot);
+    }
+    return _emotionData;
 }

@@ -15,19 +15,19 @@ namespace MHV
             void setRGBData(const void* data) override;
             void setDepthData(const void* data) override;
             void setPointCloudData(const float* data) override;
-            void setDetectionBoxes(const float* data) override;
+            void setDetectionBox(const int* data) override;
             void setEmotionState(const char* data) override;
 
             const unsigned char* getRGBData() override;
             const unsigned char* getDepthData() override;
             const float* getPointCloudData() override;
-            const float* getDetectionBoxes() override;
+            const int* getDetectionBox() override;
             const char* getEmotionState() override;
         private:
             unsigned char* _depthData;
             unsigned char* _rgbData;
             float* _pointCloudData;
-            float* _detectionData;
+            int* _detectionData;
             char* _emotionData;
 
             int _rgbSharedMemory;

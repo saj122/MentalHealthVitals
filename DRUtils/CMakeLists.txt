@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(glog REQUIRED)
 find_package(RapidJSON REQUIRED)
+find_package (SQLite3)
+find_package(OpenSSL REQUIRED)
+find_package(UUID REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
         MemoryUnix.cpp
@@ -15,11 +18,20 @@ add_library(${PROJECT_NAME} STATIC
         Memory.h
         MemoryFactory.h
         Config.h
+        Database.cpp
+        Database.h
+        Hashing.cpp
+        Hashing.h
+        Patient.h
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${RAPIDJSON_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${OPENSSL_INCLUDE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glog::glog)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${OPENSSL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE SQLite::SQLite3)
+target_link_libraries(${PROJECT_NAME} PRIVATE UUID::UUID)
 
 enable_testing()
 
