@@ -1,0 +1,9 @@
+<Project>
+<InputFiles>
+    <PFile>./PSrc</PFile>
+    <PFile>./PTst</PFile>
+    <PFile>./PSpec</PFile>
+</InputFiles>
+<ProjectName>VerificationTest</ProjectName>
+<OutputDir>./PGenerated/</OutputDir>
+</Project>
