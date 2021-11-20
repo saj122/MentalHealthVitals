@@ -20,7 +20,7 @@ Build:
 
     mkdir build 
     cd build
-    cmake -G Xcode -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3 -DOPENSSL_LIBRARIES=/opt/homebrew/opt/openssl@3/lib .. 
+    cmake -G Xcode -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3 -DOPENSSL_LIBRARIES=/opt/homebrew/opt/openssl@3/lib .. 
     Open project in xcode and BUILD_ALL.
 
 
