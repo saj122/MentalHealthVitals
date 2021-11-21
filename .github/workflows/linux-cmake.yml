@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Install Apt Deps
-      run: sudo apt update && sudo apt install -y libssl-dev rapidjson-dev build-essential libgl1-mesa-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 libc++abi-dev libmongoc-dev libbson-dev libgflags-dev libgoogle-glog-dev libgmock-dev libgtest-dev libopencv-dev curl cmake git wget
+      run: sudo apt update && sudo apt install -y libssl-dev libsqlite3-dev rapidjson-dev build-essential libgl1-mesa-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libgstreamer-plugins-bad1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 libgflags-dev libgoogle-glog-dev libgmock-dev libgtest-dev libopencv-dev curl cmake git wget
       
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
@@ -33,85 +33,6 @@ jobs:
     - name: Setup Library Path
       run: sudo ldconfig
         
-    - name: Download Mongodb
-      run: wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-      
-    - name: Add Mongo to App Sources
-      run: echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
-      
-    - name: Install Mongo
-      run: sudo apt update && sudo apt-get install -y mongodb-org libssl-dev libsasl2-dev
-      
-    - name: Start Mongo and Reload Daemon
-      run: sudo systemctl start mongod && sudo systemctl daemon-reload
-      
-    - name: Download Mongodb-c-driver
-      run: wget https://github.com/mongodb/mongo-c-driver/releases/download/1.19.1/mongo-c-driver-1.19.1.tar.gz
-      
-    - name: Extract Tar
-      run: tar -xzf mongo-c-driver-1.19.1.tar.gz
-      
-    - name: Make Dir Build
-      run: mkdir cmake-build
-      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1
-      
-    - name: Generate Build Files
-      run: cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF ..
-      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1/cmake-build
-      
-    - name: Build Files
-      run: make -j$(nproc)
-      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1/cmake-build
-      
-    - name: Install Mongoc
-      run: sudo make install
-      working-directory: ${{github.workspace}}/mongo-c-driver-1.19.1/cmake-build
-      
-    - name: Download Mongodb-cxx-driver
-      run: curl -OL https://github.com/mongodb/mongo-cxx-driver/releases/download/r3.6.6/mongo-cxx-driver-r3.6.6.tar.gz
-   
-    - name: Extract Tar
-      run: tar -xzf mongo-cxx-driver-r3.6.6.tar.gz
-      
-    - name: Generate Build Files
-      run: cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
-      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
-      
-    - name: Build Mongo Core
-      run: sudo cmake --build . --target EP_mnmlstc_core
-      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
-      
-    - name: Build Driver
-      run: cmake --build .
-      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
-      
-    - name: Install Driver
-      run: sudo cmake --build . --target install
-      working-directory: ${{github.workspace}}/mongo-cxx-driver-r3.6.6/build
-          
-    - name: Download Open3D
-      run: git clone --recursive https://github.com/intel-isl/Open3D.git
-     
-    - name: Change Dir & Install Deps
-      run: ./install_deps_ubuntu.sh
-      working-directory: ${{github.workspace}}/Open3D/util
-      
-    - name: Change to Build Dir
-      run: mkdir build 
-      working-directory: ${{github.workspace}}/Open3D
-      
-    - name: Generate Build Files
-      run: cmake -DBUILD_SHARED_LIBS=ON -DBUILD_PYTHON_MODULE=OFF -DCMAKE_INSTALL_PREFIX=/usr/local ..
-      working-directory: ${{github.workspace}}/Open3D/build
-      
-    - name: Build Open3D
-      run: make -j$(nproc)
-      working-directory: ${{github.workspace}}/Open3D/build
-      
-    - name: Install Open3D
-      run: sudo make install
-      working-directory: ${{github.workspace}}/Open3D/build
-
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build
 
