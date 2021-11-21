@@ -45,3 +45,6 @@ Build:
     cd build
     cmake -DCMAKE_PREFIX_PATH=/opt/Qt/6.1.3/gcc_64/lib/cmake ..
     make -j$(nproc)
+
+### Unit Tests:
+### Verification Test:
