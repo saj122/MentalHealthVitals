@@ -38,3 +38,6 @@ build_release
 build_relwithdebug
 .idea
 cmake-build-debug
+**.cs
+**.DS_Store
+**.pdb

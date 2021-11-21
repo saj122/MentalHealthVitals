@@ -1,6 +1,9 @@
 #include "Controller.h"
 
+#ifndef ENABLE_OPENNI2
 #include "OpenNICamera.h"
+#endif
+
 #include "GSCamera.h"
 #include "Config.h"
 
@@ -41,7 +44,11 @@ void MHV::Controller::start()
     LOG(INFO) << "Height of image: " << h;
 
     if(source.compare("OpenNI") == 0)
-        _camera = std::make_unique<MHV::OpenNICamera>(w,h);
+#ifndef ENABLE_OPENNI2
+            _camera = std::make_unique<MHV::OpenNICamera>(w,h);
+#else
+            LOG(FATAL) << "OpenNI camera not supported on system. If you have a webcam, change camera type to AVFoundation in config.";
+#endif
     else if(source.compare("V4L") == 0 || source.compare("AVFoundation") == 0)
         _camera = std::make_unique<MHV::GSCamera>(w,h);
 

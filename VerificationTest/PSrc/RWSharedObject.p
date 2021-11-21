@@ -1,7 +1,7 @@
 event eAcqReadLock: machine;
 event eReleaseReadLock: machine;
 event eAcqWriteLock: machine;
-event eReleaseWriteLock: any;
+event eReleaseWriteLock: (writer: machine, val: any);
 event eRWLockGranted: any;
 
 machine RWSharedObject {
@@ -82,7 +82,9 @@ machine RWSharedObject {
       currentWriter = writer;
     }
 
-    on eReleaseWriteLock do (val: any){
+    on eReleaseWriteLock do (payload : (writer: machine, val: any)){
+      assert(payload.writer == currentWriter), "Trying to release lock before acquiring it!!";
+      sharedObj = payload.val;
       currentWriter = null as machine;
       goto ChooseReadOrWriteLock;
     }
@@ -119,18 +121,19 @@ fun ReleaseReadLock(rwlock: RWSharedObject, client: machine) {
 
 fun AcquireWriteLock(rwlock: RWSharedObject, client: machine) : any {
   var retObj: any;
-    send rwlock, eAcqWriteLock, client;
-    receive {
-      case eRWLockGranted: (obj: any) {
-        print format ("Write Lock {0} Acquired by {1}", rwlock, client);
-        retObj = obj;
-      }
+  send rwlock, eAcqWriteLock, client;
+  receive {
+    case eRWLockGranted: (obj: any) {
+      print format ("Write Lock {0} Acquired by {1}", rwlock, client);
+      retObj = obj;
     }
-    return retObj;
+  }
+  return retObj;
 }
 
 fun ReleaseWriteLock(rwlock: RWSharedObject, client: machine, val: any) {
-  send rwlock, eReleaseWriteLock, val;
+  announce eObjWrite, val;
+  send rwlock, eReleaseWriteLock, (writer = client, val = val);
   print format ("Write Lock {0} Released by {1}", rwlock, client);
 }
 

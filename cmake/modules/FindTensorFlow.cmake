@@ -3,11 +3,11 @@ if(TENSORFLOW_INCLUDE_DIR AND TENSORFLOW_LIBRARIES)
 else (TENSORFLOW_INCLUDE_DIR AND TENSORFLOW_LIBRARIES)
 	if(NOT WIN32)
 		find_path(TENSORFLOW_INCLUDE_DIR 
-		NAMES "c_api.h"
-		PATHS /usr/local/include/tensorflow/c /usr/include/tensorflow/c
+		NAMES "tensorflow/c/c_api.h"
+		PATHS /usr/local/include
 		)
 
-		set(TENSORFLOW_INCLUDE_DIR ${TENSORFLOW_INCLUDE_DIR}/tensorflow)
+		set(TENSORFLOW_INCLUDE_DIR ${TENSORFLOW_INCLUDE_DIR})
 	endif(NOT WIN32)
 
 	if(WIN32)
@@ -41,7 +41,8 @@ else (TENSORFLOW_INCLUDE_DIR AND TENSORFLOW_LIBRARIES)
 
 	if (TENSORFLOW_FOUND)
 		if (NOT TensorFlow_FIND_QUIETLY)
-			message(STATUS "Found TensorFlow: ${TENSORFLOW_LIBRARIES}")
+			message(STATUS "Found TensorFlow Headers: ${TENSORFLOW_INCLUDE_DIR}")
+			message(STATUS "Found TensorFlow Libraries: ${TENSORFLOW_LIBRARIES}")
 		endif (NOT TensorFlow_FIND_QUIETLY)
 	else (TENSORFLOW_FOUND)
 		if (TensorFlow_FIND_REQUIRED)

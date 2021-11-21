@@ -10,7 +10,7 @@ namespace MHV
     class Memory
     {
         public:
-            virtual ~Memory() = default;
+            virtual ~Memory() {};
             virtual void setRGBData(const void* data) = 0;
             virtual void setDepthData(const void* data) = 0;
             virtual void setPointCloudData(const float* data) = 0;

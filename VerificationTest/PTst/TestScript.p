@@ -1,2 +1,2 @@
-test tcProcessUsingMemory [main=TestWithProcess]:
-  assert MemoryValueAlwaysCorrect in (union { TestWithProcess }, Process);
+test tcRW [main=ReadProcess]:
+  assert ValIsAlwaysCorrect in {WriteProcess, ReadProcess, RWSharedObject};

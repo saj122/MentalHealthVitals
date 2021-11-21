@@ -1,6 +1,6 @@
 {
-    "Source": "OpenNI",
-    "Type": "RGBD",
+    "Source": "AVFoundation",
+    "Type": "RGB",
     "Width": 640,
     "Height": 480
 }

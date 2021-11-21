@@ -6,16 +6,16 @@
 
 #include <sqlite3.h>
 
-#include <glog/logging.h>
-
 #include <uuid/uuid.h>
+
+#include <glog/logging.h>
 
 MHV::Database::Database() : _db(nullptr),
                             _msgError(nullptr)
 {
     if (sqlite3_open("MHV", &_db) != SQLITE_OK)
     {
-        LOG(FATAL) << "Error opening database: " << sqlite3_errmsg(_db);
+        LOG(ERROR) << "Error opening database: " << sqlite3_errmsg(_db);
     }
 
     std::string createUserTable = "CREATE TABLE IF NOT EXISTS USERS(" \
@@ -36,7 +36,7 @@ MHV::Database::Database() : _db(nullptr),
 
     if(sqlite3_exec(_db, createUserTable.c_str(), NULL, 0, &_msgError) != SQLITE_OK)
     {
-        LOG(FATAL) << "Error creating table - " << _msgError;
+        LOG(ERROR) << "Error creating table - " << _msgError;
     }
 
     std::string createAuthTable = "CREATE TABLE IF NOT EXISTS AUTH(" \
@@ -48,7 +48,7 @@ MHV::Database::Database() : _db(nullptr),
 
     if(sqlite3_exec(_db, createAuthTable.c_str(), NULL, 0, &_msgError) != SQLITE_OK)
     {
-        LOG(FATAL) << "Error creating table - " << _msgError;
+        LOG(ERROR) << "Error creating table - " << _msgError;
     }
 }
 

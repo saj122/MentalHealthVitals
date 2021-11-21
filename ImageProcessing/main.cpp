@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
     cv::CascadeClassifier clfr(HAARCASCADE_PATH);
 
     std::vector<cv::Rect> features;
-    float* box = new float[4];
+    int* box = new int[4];
 
     while(!__stop)
     {
