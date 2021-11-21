@@ -32,7 +32,34 @@ jobs:
       
     - name: Setup Library Path
       run: sudo ldconfig
-        
+      
+    - name: Install DotNet
+      run: |
+        wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+        sudo dpkg -i packages-microsoft-prod.deb
+        rm packages-microsoft-prod.deb
+        sudo apt-get update
+        sudo apt-get install -y apt-transport-https
+        sudo apt-get update
+        sudo apt-get install -y dotnet-sdk-3.1
+
+    - name: Install Java
+      run: sudo apt install default-jre
+
+    - name: Install P Compiler
+      run: dotnet tool install --global P
+
+    - name: Install Coyote
+      run: dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
+
+    - name: Build P Project
+      working-directory: ${{github.workspace}}/VericationTest
+      run: pc -proj:VerificationTest.pproj
+      
+    - name: Run Verication Test
+      working-directory: ${{github.workspace}}/VericationTest/POutput/netcoreapp3.1
+      run: coyote test VericationTest.dll -m PImplementation.tcRW.Execute
+
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build
 
