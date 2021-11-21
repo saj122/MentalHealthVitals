@@ -17,8 +17,8 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Homebrew Deps
-        run: brew install ossp-uuid openssl cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3
-      
+        run: brew install ossp-uuid openssl cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3 gnu-tar
+        
       - name: Create Symlinks for Openssl
         run: brew link openssl --force
       
@@ -26,8 +26,24 @@ jobs:
         run: wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz
       
       - name: Extract Tar
-        run: sudo tar xf libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz -C /usr/local
+        run: sudo gtar xf libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz -C /usr/local
             
+      - name: Install P and Coyote
+        run: |
+            brew tap isen-ng/dotnet-sdk-versions
+            brew install --cask dotnet-sdk3-1-400
+            brew install java
+            dotnet tool install --global P
+            dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
+            
+      -name: Build Verication Test
+        working-directory: ${{github.workspace}}/VericationTest
+        run: pc -proj:VerificationTest.pproj
+
+      -name: Run Verication Test
+        working-directory: ${{github.workspace}}/VericationTest/POutput/netcoreapp3.1
+        run: coyote test VericationTest.dll -m PImplementation.tcRW.Execute
+
       - name: Configure CMake
         run: cmake -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3 -DOPENSSL_LIBRARIES=/opt/homebrew/opt/openssl@3/lib -B ${{github.workspace}}/build
 
