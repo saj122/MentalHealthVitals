@@ -43,11 +43,11 @@ jobs:
             dotnet tool install --global P
             dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
             
-      - name: Build Verication Test
-        working-directory: ${{github.workspace}}/VericationTest
+      - name: Build Verification Test
+        working-directory: ${{github.workspace}}/VerificationTest
         run: pc -proj:VerificationTest.pproj
 
-      - name: Run Verication Test
+      - name: Run Verification Test
         working-directory: ${{github.workspace}}/VericationTest/POutput/netcoreapp3.1
         run: coyote test VericationTest.dll -m PImplementation.tcRW.Execute
 
