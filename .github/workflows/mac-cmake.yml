@@ -32,11 +32,13 @@ jobs:
         run: |
           sudo cp -r include /usr/local
           sudo cp -r lib /usr/local
+          
+      - uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '3.1.x'
         
       - name: Install P and Coyote
         run: |
-            brew tap isen-ng/dotnet-sdk-versions
-            brew install --cask dotnet-sdk3-1-400
             brew install java
             dotnet tool install --global P
             dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
