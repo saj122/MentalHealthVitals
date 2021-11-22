@@ -20,7 +20,9 @@ jobs:
         run: brew install ossp-uuid openssl cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3 wget
         
       - name: Create Symlinks for Openssl
-        run: brew link openssl --force
+        run: |
+          ln -s /usr/local/opt/openssl/lib/libcrypto.3.dylib /usr/local/lib/
+          ln -s /usr/local/opt/openssl/lib/libssl.3.dylib /usr/local/lib/
       
       - name: Download Tensorflow
         run: wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz
@@ -52,7 +54,7 @@ jobs:
         run: coyote test VerificationTest.dll -m PImplementation.tcRW.Execute
 
       - name: Configure CMake
-        run: cmake -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@3/lib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@3/include -B ${{github.workspace}}/build
+        run: cmake -DCMAKE_FIND_FRAMEWORK=LAST -B ${{github.workspace}}/build
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
