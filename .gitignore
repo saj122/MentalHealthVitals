@@ -41,3 +41,8 @@ cmake-build-debug
 **.cs
 **.DS_Store
 **.pdb
+**.csproj
+Verification/obj/*
+Verification/POutput/*
+Verification/PGenerated/*
+Verification/.idea
