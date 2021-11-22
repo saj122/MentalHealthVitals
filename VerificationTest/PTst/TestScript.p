@@ -1,2 +1,2 @@
-test tcRW [main=ReadProcess]:
-  assert ValIsAlwaysCorrect in {WriteProcess, ReadProcess, RWSharedObject};
+test tcRW [main=OS]:
+  assert ValIsAlwaysCorrect in {WriteProcess, ReadProcess, OS, RWSharedObject};

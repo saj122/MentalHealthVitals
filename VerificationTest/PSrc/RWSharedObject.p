@@ -109,6 +109,7 @@ fun AcquireReadLock(rwlock: RWSharedObject, client: machine) : any {
     case eRWLockGranted: (obj: any){
       print format ("Read Lock {0} Acquired by {1}", rwlock, client);
       ret = obj;
+      announce eObjRead, ret;
     }
   }
   return ret;

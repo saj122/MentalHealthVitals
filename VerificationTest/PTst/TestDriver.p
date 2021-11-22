@@ -13,6 +13,18 @@ machine WriteProcess {
 }
 
 machine ReadProcess {
+  start state Init {
+    entry(payload: (machine, RWSharedObject))
+    {
+      var val: int;
+      val = AcquireReadLock(payload.1, this) as int;
+      ReleaseReadLock(payload.1, this);
+      send payload.0, doneInc;
+    }
+  }
+}
+
+machine OS {
   var count: int;
   var val: int;
   var sharedObj: RWSharedObject;
@@ -22,13 +34,15 @@ machine ReadProcess {
       announce eSpec_ValIsAlwaysCorrect_Init, val;
       sharedObj = new RWSharedObject(0);
       new WriteProcess(this, sharedObj);
+      new ReadProcess(this, sharedObj);
       new WriteProcess(this, sharedObj);
     }
     on doneInc do {
       count = count + 1;
-      if(count == 2)
+      if(count == 3)
       {
         val = AcquireReadLock(sharedObj, this) as int;
+        print format ("Final value is: {0}.", val); 
         assert val == 2, "Async increment failed.";
         ReleaseReadLock(sharedObj, this);
       }
