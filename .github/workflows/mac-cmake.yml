@@ -52,7 +52,7 @@ jobs:
         run: coyote test VerificationTest.dll -m PImplementation.tcRW.Execute
 
       - name: Configure CMake
-        run: cmake -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_ROOT_DIR=/opt/homebrew/opt/openssl@3 -DOPENSSL_LIBRARIES=/opt/homebrew/opt/openssl@3/lib -B ${{github.workspace}}/build
+        run: cmake -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl@3 -DOPENSSL_LIBRARIES=/usr/local/opt/openssl@3/lib -B ${{github.workspace}}/build
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
