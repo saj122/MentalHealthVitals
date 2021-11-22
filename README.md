@@ -8,12 +8,20 @@ Install dependencies:
 2. Run in terminal
    
        xcode-select --install
-       brew install ossp-uuid openssl cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3
-       brew link openssl --force
+       brew install ossp-uuid cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3
 
-3. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version.
+3. Build & Install OpenSSL
+
+       wget --no-check-certificate https://www.openssl.org/source/openssl-3.0.0.tar.gz
+       tar xf openssl-3.0.0.tar.gz
+       cd openssl-3.0.0
+       ./Configure
+       make 
+       sudo make install
+
+4. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version.
    https://www.tensorflow.org/install/lang_c
-4. Extract to /usr/local
+5. Extract to /usr/local
 
        sudo tar xf <FILE>.tar.gz -C /usr/local
 

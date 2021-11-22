@@ -17,13 +17,16 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Homebrew Deps
-        run: brew install ossp-uuid openssl cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3 wget
+        run: brew install ossp-uuid cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3 wget
         
-      - name: Create Symlinks for Openssl
+      - name: Build & Install OpenSSL        
         run: |
-          ln -s /usr/local/opt/openssl/lib/libcrypto.3.dylib /usr/local/lib/
-          ln -s /usr/local/opt/openssl/lib/libssl.3.dylib /usr/local/lib/
-          ln -s /usr/local/opt/openssl/include/openssl /usr/local/include
+          wget --no-check-certificate https://www.openssl.org/source/openssl-3.0.0.tar.gz
+          tar xf openssl-3.0.0.tar.gz
+          cd openssl-3.0.0
+          ./Configure
+          make 
+          sudo make install
       
       - name: Download Tensorflow
         run: wget https://storage.googleapis.com/tensorflow/libtensorflow/libtensorflow-cpu-darwin-x86_64-2.6.0.tar.gz
@@ -42,9 +45,9 @@ jobs:
         
       - name: Install P and Coyote
         run: |
-            brew install java
-            dotnet tool install --global P
-            dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
+          brew install java
+          dotnet tool install --global P
+          dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
             
       - name: Build Verification Test
         working-directory: ${{github.workspace}}/VerificationTest
