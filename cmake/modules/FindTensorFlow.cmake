@@ -8,9 +8,9 @@ else (TENSORFLOW_INCLUDE_DIR AND TENSORFLOW_LIBRARIES)
 
 	set(TENSORFLOW_INCLUDE_DIR ${TENSORFLOW_INCLUDE_DIR})
 
-	if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
+	if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm64")
 		find_library(TENSORFLOW_LIBRARIES
-			NAMES tensorflow
+			NAMES tensorflowlite_c
 			PATHS
 			${_obLinkDir}
 			${GNUWIN32_DIR}/lib
@@ -20,7 +20,7 @@ else (TENSORFLOW_INCLUDE_DIR AND TENSORFLOW_LIBRARIES)
 		)
 	else()
 		find_library(TENSORFLOW_LIBRARIES
-				NAMES tensorflowlite_c
+				NAMES tensorflow
 				PATHS
 				${_obLinkDir}
 				${GNUWIN32_DIR}/lib

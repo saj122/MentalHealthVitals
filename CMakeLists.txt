@@ -4,6 +4,8 @@ project(DepressionRecognition)
 
 set(CMAKE_CXX_STANDARD 17)
 
+message(STATUS "Arch: ${CMAKE_SYSTEM_PROCESSOR}")
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 
 add_compile_definitions(CONFIG_PATH=\"${CMAKE_SOURCE_DIR}/config/camera.json\")
