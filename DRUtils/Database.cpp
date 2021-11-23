@@ -149,7 +149,7 @@ std::optional<std::string> MHV::Database::lookUpUser(std::string user)
     checkUserInTable.append("';");
     if(sqlite3_exec(_db, checkUserInTable.c_str(), exec_callback, 0, &_msgError) != SQLITE_OK)
     {
-        LOG(INFO) << "User not found.";
+        LOG(INFO) << "User not found: " << _msgError;
         return std::nullopt;
     }
 

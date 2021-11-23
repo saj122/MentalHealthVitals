@@ -24,8 +24,6 @@ namespace MHV
             void run() override;
             bool isValid() override;
         private:
-            std::vector<float> calculatePointCloud(const uint16_t* depth);
-        private:
             std::unique_ptr<Memory> _utils;
 
             openni::Device _device;

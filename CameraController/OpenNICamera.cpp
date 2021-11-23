@@ -64,7 +64,6 @@ void MHV::OpenNICamera::init()
         LOG(FATAL) << "No valid streams.";
     }
 
-    _depthVideoMode = _depth.getVideoMode();
     _colorVideoMode = _color.getVideoMode();
 
     _colorVideoMode.setPixelFormat(openni::PixelFormat::PIXEL_FORMAT_RGB888);
@@ -76,38 +75,6 @@ void MHV::OpenNICamera::init()
     LOG(INFO) << "FPS: " << _colorVideoMode.getFps();
 
     _streams.get()[0] = &_color;
-}
-
-std::vector<float> MHV::OpenNICamera::calculatePointCloud(const uint16_t* depth)
-{
-    std::vector<float> points;
-    points.reserve(_width*_height*3);
-
-#pragma omp parallel for
-    for( uint32_t y = 0; y < _height; y++ )
-    {
-        for( uint32_t x = 0; x < _width; x++ )
-        {
-            const uint16_t z = depth[y * _width + x];
-            if( !z )
-            {
-                continue;
-            }
-
-            float wx, wy, wz;
-            openni::Status rc = openni::CoordinateConverter::convertDepthToWorld( _depth, static_cast<float>( x ), static_cast<float>( y ), static_cast<float>( z ), &wx, &wy, &wz );
-            if(rc != openni::STATUS_OK)
-            {
-                LOG(ERROR) << "Can't convert depth to world.";
-            }
-
-            points.push_back(wx);
-            points.push_back(wy);
-            points.push_back(wz);
-        }
-    }
-
-    return points;
 }
 
 void MHV::OpenNICamera::run()
