@@ -58,7 +58,7 @@ jobs:
       
     - name: Run Verication Test
       working-directory: ${{github.workspace}}/VerificationTest/POutput/netcoreapp3.1
-      run: coyote test VerificationTest.dll -m PImplementation.tcRW.Execute
+      run: coyote test VerificationTest.dll -m PImplementation.tcRW.Execute -i 1000
 
     - name: Configure CMake
       run: cmake -B ${{github.workspace}}/build
