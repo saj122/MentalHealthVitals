@@ -20,7 +20,7 @@ link_directories(
 )
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "amd64")
+    if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
         add_executable(${PROJECT_NAME}
           main.cpp
           Camera.h

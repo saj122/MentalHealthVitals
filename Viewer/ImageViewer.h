@@ -23,8 +23,7 @@ namespace MHV
         public:
             enum class Type
             {
-                RGB,
-                DEPTH
+                RGB
             };
         public:
             ImageViewer(Type type = Type::RGB);

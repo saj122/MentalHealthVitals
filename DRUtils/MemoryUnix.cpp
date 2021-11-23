@@ -9,45 +9,15 @@
 #include <glog/logging.h>
 
 MHV::MemoryUnix::MemoryUnix(size_t rgb_size) : _rgbData(new unsigned char[rgb_size]),
-                                               _depthData(nullptr),
-                                               _pointCloudData(nullptr),
                                                _detectionData(new int[4]),
                                                _emotionData(new char[100]),
                                                _rgbSharedMemory(0),
-                                               _depthSharedMemory(0),
-                                               _pointCloudSharedMemory(0),
                                                _detectionMemory(0),
                                                _emotionMemory(0),
                                                _rgb_size(rgb_size),
-                                               _depth_size(0),
-                                               _point_cloud_size(0),
                                                _rgbSemID(0),
-                                               _depthSemID(0),
-                                               _pointCloudSemID(0),
                                                _detectSemID(0),
                                                _emotionSemID(0)
-{
-
-}
-
-MHV::MemoryUnix::MemoryUnix(size_t rgb_size, size_t depth_size, size_t point_cloud_size) :                                                       _rgbData(new unsigned char[rgb_size]),
-                                                                                           _depthData(new unsigned char[depth_size]),
-                                                                                           _pointCloudData(new float[point_cloud_size]),
-                                                                                           _detectionData(new int[4]),
-                                                                                           _emotionData(new char[100]),
-                                                                                           _rgbSharedMemory(0),
-                                                                                           _depthSharedMemory(0),
-                                                                                           _pointCloudSharedMemory(0),
-                                                                                           _detectionMemory(0),
-                                                                                           _emotionMemory(0),
-                                                                                           _rgb_size(rgb_size),
-                                                                                           _depth_size(depth_size),
-                                                                                           _point_cloud_size(point_cloud_size),
-                                                            _rgbSemID(0),
-                                                            _depthSemID(0),
-                                                            _pointCloudSemID(0),
-                                                            _detectSemID(0),
-                                                            _emotionSemID(0)
 {
 
 }
@@ -57,30 +27,13 @@ MHV::MemoryUnix::~MemoryUnix()
     delete[] _rgbData;
     delete[] _detectionData;
     delete[] _emotionData;
-    if(_depthData)
-        delete[] _depthData;
-    if(_pointCloudData)
-        delete[] _pointCloudData;
 
     shmctl(_rgbSharedMemory,IPC_RMID,NULL);
-    shmctl(_depthSharedMemory,IPC_RMID,NULL);
-    shmctl(_pointCloudSharedMemory,IPC_RMID,NULL);
     shmctl(_detectionMemory,IPC_RMID,NULL);
     shmctl(_emotionMemory,IPC_RMID,NULL);
     
-    _rgbSemID = semget((key_t)1234, 1, 0);
     semctl(_rgbSemID, 0, IPC_RMID);
-    
-    _depthSemID = semget((key_t)2345, 1, 0);
-    semctl(_depthSemID, 0, IPC_RMID);
-    
-    _pointCloudSemID = semget((key_t)3456, 1, 0);
-    semctl(_pointCloudSemID, 0, IPC_RMID);
-    
-    _detectSemID = semget((key_t)4567, 1, 0);
     semctl(_detectSemID, 0, IPC_RMID);
-    
-    _emotionSemID = semget((key_t)5678, 1, 0);
     semctl(_emotionSemID, 0, IPC_RMID);
 }
 
@@ -168,49 +121,6 @@ void MHV::MemoryUnix::setRGBData(const void* data)
     shmdt(shmData);
 }
 
-void MHV::MemoryUnix::setDepthData(const void* data)
-{
-    struct sembuf buf;
-    
-    _depthSharedMemory = shmget((key_t)456, _depth_size, 0666|IPC_CREAT);
-    if(_depthSharedMemory == -1)
-    {
-        LOG(ERROR) << "Couldn't get depth shared memory.";
-        return;
-    }
-
-    void* shmData = shmat(_depthSharedMemory, NULL, 0);
-    
-    setSemaphore(buf, _depthSemID,2345);
-    
-    std::memcpy(shmData, data, _depth_size);
-    
-    releaseResource(buf, _depthSemID);
-
-    shmdt(shmData);
-}
-
-void MHV::MemoryUnix::setPointCloudData(const float* data)
-{
-    struct sembuf buf;
-    
-    _pointCloudSharedMemory = shmget((key_t)789, _point_cloud_size*4, 0666|IPC_CREAT);
-    if(_pointCloudSharedMemory == -1)
-    {
-        LOG(ERROR) << "Couldn't get point cloud shared memory.";
-        return;
-    }
-    float* shmData = (float*)shmat(_pointCloudSharedMemory, NULL, 0);
-
-    setSemaphore(buf, _pointCloudSemID, 3456);
-    
-    std::memcpy(shmData, data, _point_cloud_size*4);
-
-    releaseResource(buf, _pointCloudSemID);
-    
-    shmdt(shmData);
-}
-
 void MHV::MemoryUnix::setDetectionBox(const int* data)
 {
     struct sembuf buf;
@@ -268,47 +178,6 @@ const unsigned char* MHV::MemoryUnix::getRGBData()
 
     shmdt(image);
     return _rgbData;
-}
-
-const unsigned char* MHV::MemoryUnix::getDepthData()
-{
-    if(_depthData)
-    {
-        _depthSharedMemory = shmget((key_t)456,  _depth_size, 0666|IPC_CREAT);
-        if(_depthSharedMemory == -1)
-        {
-            LOG(ERROR) << "Couldn't get depth shared memory.";
-            return nullptr;
-        }
-
-        void* image = shmat(_depthSharedMemory, NULL, 0);
-
-        std::memcpy(_depthData, image, _depth_size);
-
-        shmdt(image);
-    }
-    return _depthData;
-}
-
-const float* MHV::MemoryUnix::getPointCloudData()
-{
-    if(_pointCloudData)
-    {
-        _pointCloudSharedMemory = shmget((key_t)789, _point_cloud_size*4, 0666|IPC_CREAT);
-        if(_pointCloudSharedMemory == -1)
-        {
-            LOG(ERROR) << "Couldn't get point cloud shared memory.";
-            return nullptr;
-        }
-
-        void* cloud = shmat(_pointCloudSharedMemory, NULL, 0);
-
-        std::memcpy(_pointCloudData, cloud, _point_cloud_size*4);
-
-        shmdt(cloud);
-    }
-
-    return _pointCloudData;
 }
 
 const int* MHV::MemoryUnix::getDetectionBox()

@@ -29,12 +29,9 @@ namespace MHV
             std::unique_ptr<Memory> _utils;
 
             openni::Device _device;
-            openni::VideoStream _depth;
             openni::VideoStream _color;
             std::unique_ptr<openni::VideoStream*> _streams;
-            openni::VideoFrameRef _depthFrame;
             openni::VideoFrameRef _colorFrame;
-            openni::VideoMode _depthVideoMode;
             openni::VideoMode _colorVideoMode;
 
             uint32_t _width;

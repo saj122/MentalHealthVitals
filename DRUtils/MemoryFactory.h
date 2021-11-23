@@ -18,11 +18,6 @@ namespace MHV
             {
                 return std::make_unique<MHV::MemoryUnix>(rgb_size);
             }
-
-            static std::unique_ptr<MHV::Memory> create(size_t rgb_size, size_t depth_size, size_t point_cloud_size)
-            {
-                return std::make_unique<MHV::MemoryUnix>(rgb_size, depth_size, point_cloud_size);
-            }
     };
 }
 

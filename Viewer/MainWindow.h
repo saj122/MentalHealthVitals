@@ -10,7 +10,6 @@ namespace Ui { class MainWindow; }
 namespace MHV
 {
     class ImageViewer;
-    class PointCloudViewer;
     class Hashing;
     class Database;
 }
@@ -27,8 +26,6 @@ namespace MHV
 
         private slots:
             void on_actionExit_triggered();
-            void depthViewerChecked(bool checked);
-            void pointCloudViewerChecked(bool checked);
             void setToPage();
             void registerUser();
             void loginUser();
@@ -37,8 +34,6 @@ namespace MHV
             Ui::MainWindow *ui;
 
             std::unique_ptr<ImageViewer> _rgbViewer;
-            std::unique_ptr<ImageViewer> _depthViewer;
-            std::unique_ptr<PointCloudViewer> _pointCloudViewer;
 
             std::unique_ptr<Database> _database;
             std::unique_ptr<Hashing> _hashing;

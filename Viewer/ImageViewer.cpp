@@ -4,18 +4,19 @@
 #include <QOpenGLTexture>
 
 #include "MemoryFactory.h"
+#include "Config.h"
 
 #include "glog/logging.h"
 
-#define WIDTH 640
-#define HEIGHT 480
-
 MHV::ImageViewer::ImageViewer(Type type) : _viewerType(type)
 {
-    if(_viewerType == Type::RGB)
-        _utils = MemoryFactory::create(WIDTH*HEIGHT*3);
-    else
-        _utils = MemoryFactory::create(WIDTH*HEIGHT*3, WIDTH*HEIGHT*2, WIDTH*HEIGHT*3);
+    MHV::Config::loadConfig();
+
+    std::string source = MHV::Config::getSource();
+    int w = MHV::Config::getWidth();
+    int h = MHV::Config::getHeight();
+
+    _utils = MemoryFactory::create(w*h*3);
     startTimer(1);
 }
 
@@ -98,12 +99,6 @@ void MHV::ImageViewer::paintGL()
            if(image)
                _texture->setData(QOpenGLTexture::PixelFormat::RGB, QOpenGLTexture::PixelType::UInt8, image);
        }
-       else if(_viewerType == Type::DEPTH)
-       {
-           const unsigned char* image = _utils->getDepthData();
-           if (image)
-               _texture->setData(QOpenGLTexture::PixelFormat::Luminance, QOpenGLTexture::PixelType::UInt16, image);
-       }
        _texture->bind();
    }
    else
@@ -112,7 +107,7 @@ void MHV::ImageViewer::paintGL()
    }
    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-   //const int* data = _utils->getDetectionBox();
+   const int* data = _utils->getDetectionBox();
 }
 
 void MHV::ImageViewer::resizeGL(int w, int h)
@@ -128,12 +123,6 @@ void MHV::ImageViewer::makeImageTexture()
         const unsigned char* image = _utils->getRGBData();
         if (image)
             _texture = std::make_unique<QOpenGLTexture>(QImage(image, 640, 480, QImage::Format::Format_RGB888).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
-    }
-    else if(_viewerType == Type::DEPTH)
-    {
-        const unsigned char* image = _utils->getDepthData();
-        if (image)
-            _texture = std::make_unique<QOpenGLTexture>(QImage(image, 640, 480, QImage::Format::Format_Grayscale16).mirrored(false,true),  QOpenGLTexture::MipMapGeneration::DontGenerateMipMaps);
     }
 
     QVector<GLfloat> vertData;

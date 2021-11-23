@@ -66,13 +66,6 @@
     </property>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuViewer">
-    <property name="title">
-     <string>Viewer</string>
-    </property>
-    <addaction name="actionDepth"/>
-    <addaction name="actionPoint_Cloud"/>
-   </widget>
    <widget class="QMenu" name="menuDetection">
     <property name="title">
      <string>Detection</string>
@@ -81,7 +74,6 @@
     <addaction name="actionEmotion"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuViewer"/>
    <addaction name="menuDetection"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -477,16 +469,6 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
-   </property>
-  </action>
-  <action name="actionDepth">
-   <property name="text">
-    <string>Depth</string>
-   </property>
-  </action>
-  <action name="actionPoint_Cloud">
-   <property name="text">
-    <string>Point Cloud</string>
    </property>
   </action>
   <action name="actionFace">

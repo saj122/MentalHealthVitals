@@ -20,11 +20,7 @@ set(PROJECT_SOURCES
         MainWindow.ui
         ImageViewer.cpp
         ImageViewer.h
-        PointCloudViewer.h
-        PointCloudViewer.cpp
-        Geometry.h
-        ObjectBuilder.h
-        DrawCommand.h)
+)
 
 add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 

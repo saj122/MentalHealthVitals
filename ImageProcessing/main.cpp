@@ -6,6 +6,7 @@
 #include <opencv2/opencv.hpp>
 
 #include "MemoryFactory.h"
+#include "Config.h"
 
 #include <csignal>
 
@@ -28,7 +29,13 @@ int main(int argc, char *argv[])
     std::signal(SIGINT,  sigHandler);
     std::signal(SIGTERM, sigHandler);
 
-    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create(640*480*3, 640*480*2, 640*480*3);
+    MHV::Config::loadConfig();
+
+    std::string source = MHV::Config::getSource();
+    int w = MHV::Config::getWidth();
+    int h = MHV::Config::getHeight();
+
+    std::unique_ptr<MHV::Memory> mem = MHV::MemoryFactory::create(w*h*3);
 
     cv::CascadeClassifier clfr(HAARCASCADE_PATH);
 

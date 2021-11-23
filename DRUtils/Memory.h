@@ -12,13 +12,9 @@ namespace MHV
         public:
             virtual ~Memory() {};
             virtual void setRGBData(const void* data) = 0;
-            virtual void setDepthData(const void* data) = 0;
-            virtual void setPointCloudData(const float* data) = 0;
             virtual void setDetectionBox(const int* data) = 0;
             virtual void setEmotionState(const char* data) = 0;
             virtual const unsigned char* getRGBData() = 0;
-            virtual const unsigned char* getDepthData() = 0;
-            virtual const float* getPointCloudData() = 0;
             virtual const int* getDetectionBox() = 0;
             virtual const char* getEmotionState() = 0;
     };
