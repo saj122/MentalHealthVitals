@@ -58,4 +58,62 @@ Build:
     make -j$(nproc)
 
 ### Unit Tests:
+Tests are implemented with CTest and GTest:
+
+    cd build
+    make test
+
 ### Verification Test:
+OS - Mac OS X
+
+1. Install Dotnet 3
+
+       brew tap isen-ng/dotnet-sdk-versions  
+       brew install --cask dotnet-sdk3-1-400
+
+2. Install P and Coyote
+
+       brew install java
+       dotnet tool install --global P
+       dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
+
+3. Build P Project
+
+       cd VerificationTest
+       pc -proj:VerificationTest.pproj
+
+4. Run Tests
+
+       cd VerificationTest/POutput/netcoreapp3.1
+       coyote test VerificationTest.dll -m PImplementation.tcRW.Execute -i 1000
+
+OS - Ubuntu 21.04
+
+1. Install Dotnet 3
+
+       wget https://packages.microsoft.com/config/ubuntu/21.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+       sudo dpkg -i packages-microsoft-prod.deb
+       rm packages-microsoft-prod.deb
+       sudo apt-get update
+       sudo apt-get install -y apt-transport-https
+       sudo apt-get update
+       sudo apt-get install -y dotnet-sdk-3.1
+
+
+3. Install P and Coyote
+
+       sudo apt-get install default-jre
+       dotnet tool install --global P
+       dotnet tool install --global Microsoft.Coyote.CLI --version 1.0.5
+
+4. Build P Project
+
+       cd VerificationTest
+       pc -proj:VerificationTest.pproj
+
+5. Run Tests
+
+       cd VerificationTest/POutput/netcoreapp3.1
+       coyote test VerificationTest.dll -m PImplementation.tcRW.Execute -i 1000
+
+
