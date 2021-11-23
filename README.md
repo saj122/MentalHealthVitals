@@ -29,7 +29,7 @@ Build:
 
     mkdir build 
     cd build
-    cmake -G Xcode -DCMAKE_FIND_FRAMEWORK=LAST .. 
+    cmake -G Xcode -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_INCLUDE_DIR=/usr/local/include -DCMAKE_FIND_FRAMEWORK=LAST .. 
     Open project in xcode and BUILD_ALL.
 
 

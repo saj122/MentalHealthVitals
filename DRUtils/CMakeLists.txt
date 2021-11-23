@@ -26,9 +26,11 @@ add_library(${PROJECT_NAME} STATIC
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${RAPIDJSON_INCLUDE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${OPENSSL_INCLUDE_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE glog::glog)
 target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::SSL)
+target_link_libraries(${PROJECT_NAME} PRIVATE OpenSSL::Crypto)
 target_link_libraries(${PROJECT_NAME} PRIVATE SQLite::SQLite3)
 target_link_libraries(${PROJECT_NAME} PRIVATE UUID::UUID)
 
