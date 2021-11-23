@@ -135,20 +135,15 @@ void MHV::MemoryUnix::setSemaphore(struct sembuf& buf, int id, int key)
         LOG(ERROR) << "RGB set semaphore locked.";
         return;
     }
-
-    _rgbSemID = semget((key_t)1234, 1, 0);
-    semctl(_rgbSemID, 0, IPC_RMID);
 }
 
 void MHV::MemoryUnix::releaseResource(struct sembuf& buf, int id)
 {
     buf.sem_op = 1;
-    int retVal = semop(id, &buf, 1);
-    if(retVal == -1)
-    {
-        LOG(ERROR) << "RGB set semaphore locked.";
-        return;
-    }
+    semop(id, &buf, 1);
+
+    id = semget((key_t)1234, 1, 0);
+    semctl(id, 0, IPC_RMID);
 }
 
 void MHV::MemoryUnix::setRGBData(const void* data)
