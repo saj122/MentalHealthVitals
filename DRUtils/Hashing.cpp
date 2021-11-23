@@ -7,8 +7,6 @@
 #include <glog/logging.h>
 #include <iomanip>
 
-#include <openssl/evp.h>
-
 MHV::Hashing::Hashing() : _pepper("f1845c3c44410ec3b98a1ca5ccda581672f2f673e1dbd21c8db482ef8f429551")
 {
     if(!SHA256_Init(&_context))

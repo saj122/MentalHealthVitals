@@ -21,6 +21,9 @@ Install dependencies:
 
 4. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version.
    https://www.tensorflow.org/install/lang_c
+
+   Note: If system is arm64, tensorflow lite c api needs to be built instead. Downloadable libraries were built with amd64.   
+
 5. Extract to /usr/local
 
        sudo tar xf <FILE>.tar.gz -C /usr/local

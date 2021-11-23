@@ -1,12 +1,11 @@
 #ifndef MEMORY_LINUX_H
 #define MEMORY_LINUX_H
 
-#include <cstddef>
 #include "Memory.h"
 
 #include <sys/sem.h>
 
-#define NUMSEMS 2
+#include <cstddef>
 
 namespace MHV
 {
@@ -28,6 +27,9 @@ namespace MHV
             const int* getDetectionBox();
             const char* getEmotionState();
         private:
+            void setSemaphore(struct sembuf& buf, int id, int key);
+            void releaseResource(struct sembuf& buf, int id);
+        private:
             unsigned char* _depthData;
             unsigned char* _rgbData;
             float* _pointCloudData;
@@ -43,14 +45,11 @@ namespace MHV
             size_t _depth_size;
             size_t _point_cloud_size;
         
-            int _rc;
             int _rgbSemID;
             int _depthSemID;
             int _pointCloudSemID;
             int _detectSemID;
             int _emotionSemID;
-            struct sembuf _operations[2];
-            short _sarray[NUMSEMS];
     };
 }
 

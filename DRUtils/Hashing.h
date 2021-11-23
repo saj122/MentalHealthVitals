@@ -5,9 +5,12 @@
 #ifndef HASHING_H
 #define HASHING_H
 
+#define OPENSSL_API_COMPAT 0x10100000L
+
 #include <optional>
 #include <string>
 
+#include <openssl/evp.h>
 #include <openssl/sha.h>
 
 #define SHA256_LENGTH 32

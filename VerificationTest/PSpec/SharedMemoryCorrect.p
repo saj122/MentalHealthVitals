@@ -11,11 +11,12 @@ spec ValIsAlwaysCorrect observes eObjWrite , eObjRead, eSpec_ValIsAlwaysCorrect_
     }
 
     on eObjWrite do (val: int) {
-        print format ("Value after write: {0}", val);
+        memoryVal = val;
+        print format ("Value after write: {0}.", val);
     }
 
     on eObjRead do (val: any) {
-        print format ("Value after read: {0}", val);
+        assert memoryVal <= 2, "Async increment failed.";
     }
   }
 }

@@ -10,30 +10,28 @@ else (TENSORFLOW_INCLUDE_DIR AND TENSORFLOW_LIBRARIES)
 		set(TENSORFLOW_INCLUDE_DIR ${TENSORFLOW_INCLUDE_DIR})
 	endif(NOT WIN32)
 
-	if(WIN32)
-		if(NOT TENSORFLOW_INCLUDE_DIR)
-			find_path(TENSORFLOW_INCLUDE_DIR 
-				NAMES "c_api.h"
+	if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "amd64")
+		find_library(TENSORFLOW_LIBRARIES
+			NAMES tensorflow
+			PATHS
+			${_obLinkDir}
+			${GNUWIN32_DIR}/lib
+			/usr/local/lib
+			/usr/lib
+			$ENV{TENSORFLOW_LIBRARIES}
+		)
+	else()
+		find_library(TENSORFLOW_LIBRARIES
+				NAMES tensorflowlite_c
 				PATHS
-				${_obIncDir}
-				${GNUWIN32_DIR}/include
-				$ENV{TENSORFLOW_INCLUDE_DIR}
-			)
-		if(TENSORFLOW_INCLUDE_DIR)
-			set(TENSORFLOW_INCLUDE_DIR ${TENSORFLOW_INCLUDE_DIR}/tensorflow)
-		endif(TENSORFLOW_INCLUDE_DIR)
-		endif(NOT TENSORFLOW_INCLUDE_DIR)
-	endif(WIN32)
+				${_obLinkDir}
+				${GNUWIN32_DIR}/lib
+				/usr/local/lib
+				/usr/lib
+				$ENV{TENSORFLOW_LIBRARIES}
+		)
+	endif()
 
-	find_library(TENSORFLOW_LIBRARIES 
-		NAMES tensorflow
-		PATHS
-		${_obLinkDir}
-		${GNUWIN32_DIR}/lib
-		/usr/local/lib
-		/usr/lib	
-		$ENV{TENSORFLOW_LIBRARIES}
-	)
 
 	if(TENSORFLOW_INCLUDE_DIR AND TENSORFLOW_LIBRARIES)
 		set(TENSORFLOW_FOUND TRUE)
