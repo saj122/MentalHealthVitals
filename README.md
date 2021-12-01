@@ -8,23 +8,15 @@ Install dependencies:
 2. Run in terminal
    
        xcode-select --install
-       brew install ossp-uuid cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3
+       brew install openssl ossp-uuid cmake rapidjson glog gflags googletest qt gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly opencv pkg-config sqlite3
+       brew link openssl --force
 
-3. Build & Install OpenSSL
-
-       wget --no-check-certificate https://www.openssl.org/source/openssl-3.0.0.tar.gz
-       tar xf openssl-3.0.0.tar.gz
-       cd openssl-3.0.0
-       ./Configure
-       make 
-       sudo make install
-
-4. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version.
+3. Download tensorflow gpu if you have an nvidia gpu with drivers and CUDA installed otherwise download cpu version.
    https://www.tensorflow.org/install/lang_c
 
-   Note: If system is arm64, tensorflow lite c api needs to be built instead. Downloadable libraries were built with amd64.   
+   Note: If system is arm64, tensorflow cc api needs to be built and copied to /usr/local instead. Downloadable libraries were built with amd64.   
 
-5. Extract to /usr/local
+4. Extract to /usr/local
 
        sudo tar xf <FILE>.tar.gz -C /usr/local
 
@@ -32,7 +24,7 @@ Build:
 
     mkdir build 
     cd build
-    cmake -G Xcode -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_INCLUDE_DIR=/usr/local/include -DCMAKE_FIND_FRAMEWORK=LAST .. 
+    cmake -G Xcode -DCMAKE_FIND_FRAMEWORK=LAST -DOPENSSL_INCLUDE_DIR=/usr/local/include .. 
     
 Open project in xcode and BUILD_ALL.
 
