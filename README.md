@@ -1,5 +1,7 @@
 # MentalHealthVitals
 
+[![CI](https://github.com/saj122/MentalHealthVitals/blob/main/.github/workflows/mac-cmake/badge.svg)](https://github.com/saj122/MentalHealthVitals/blob/main/.github/workflows/mac-cmake.yml)
+
 ### Build from source:
 OS - Mac OS X
 
