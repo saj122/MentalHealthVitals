@@ -30,7 +30,7 @@ Build:
     
 Open project in xcode and BUILD_ALL.
 
-OS - Ubuntu 21.04
+OS - ![Ubuntu](https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)
 
 Install dependencies:
 1. Run in terminal
